@@ -141,20 +141,7 @@
         .global-amount.negative { color: #fca5a5; }
         .global-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(255,255,255,0.5); margin-bottom: 8px; }
 
-        /* ── Auth bar ── */
-        .auth-bar {
-            display: flex; align-items: center; gap: 10px;
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 10px; padding: 8px 14px;
-        }
-        .auth-avatar {
-            width: 28px; height: 28px; border-radius: 50%;
-            background: var(--blue-600); display: flex; align-items: center; justify-content: center;
-            font-size: 12px; font-weight: 700; color: #fff;
-        }
-        .auth-name { font-size: 12px; font-weight: 600; color: #fff; }
-        .auth-role { font-size: 10px; color: rgba(255,255,255,0.5); }
+
 
         /* ── Sync dot ── */
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
@@ -184,11 +171,7 @@
         }
         .toast.show { opacity: 1; }
 
-        /* ── Read-only overlay ── */
-        .readonly-overlay {
-            position: absolute; inset: 0; z-index: 10;
-            cursor: not-allowed; border-radius: 16px;
-        }
+
 
         /* ── Mobile tweaks ── */
         @media (max-width: 640px) {
@@ -285,13 +268,7 @@
 
         <!-- Actions -->
         <div class="flex items-center gap-2 flex-wrap">
-            <!-- Auth -->
-            <div id="authArea">
-                <button id="loginBtn" onclick="loginWithGoogle()" class="btn-ghost text-xs">
-                    <i data-lucide="log-in" class="w-4 h-4"></i>
-                    <span class="hide-mobile">Iniciar sesión</span>
-                </button>
-            </div>
+
 
             <!-- T.C. -->
             <div class="rate-box flex items-center gap-2">
@@ -323,10 +300,7 @@
     </div>
 </div>
 
-<!-- Read-only banner -->
-<div id="readonlyBanner" style="display:none" class="bg-amber-50 border-b border-amber-200 px-4 py-2 text-center">
-    <span class="text-amber-700 text-xs font-bold">👁 Modo lectura — inicia sesión con Google para editar</span>
-</div>
+
 
 <!-- ══ MAIN CONTENT ══ -->
 <div id="export-area">
@@ -470,8 +444,7 @@
 ═══════════════════════════════════════════ -->
 <script type="module">
 import { initializeApp }          from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getAuth, signInAnonymously, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut }
-                                   from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { getFirestore, doc, onSnapshot, setDoc, getDoc }
                                    from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
@@ -480,57 +453,33 @@ import { getFirestore, doc, onSnapshot, setDoc, getDoc }
 //  (Firebase Console → tu proyecto → ⚙️ General → Tus apps)
 // =========================================================
 const firebaseConfig = {
-    apiKey:            "AIzaSyDNLd7ntUKL37utUsNSyZMN4QdJxhUDrFA",
-    authDomain:        "flujo-caja-v2.firebaseapp.com",
-    projectId:         "flujo-caja-v2",
-    storageBucket:     "flujo-caja-v2.firebasestorage.app",
-    messagingSenderId: "417525601119",
-    appId:             "1:417525601119:web:8d41751a8810d9ecf95cea"
+    apiKey:            "AIzaSyCASutGTC3bJPsGJHUmxZaHUMDK0isMWiw",
+    authDomain:        "flujo-de-caja-d49b8.firebaseapp.com",
+    projectId:         "flujo-de-caja-d49b8",
+    storageBucket:     "flujo-de-caja-d49b8.firebasestorage.app",
+    messagingSenderId: "415973787595",
+    appId:             "1:415973787595:web:e205a799f260e7541c584e"
 };
 
-// =========================================================
-//  🔧 CORREOS AUTORIZADOS PARA EDITAR
-//  Agrega los correos de Google que pueden modificar datos.
-//  Quien no esté en esta lista solo puede ver.
-// =========================================================
-const EDITORS = [
-    "josduarviquero@gmail.com",
-    "licoa56@gmail.com",
-    "airecostarica@gmail.com"
-];
 
-const DOCUMENT_ID = 'flujo-caja-v2';
+
+const DOCUMENT_ID = 'flujo-de-caja';
 
 // ── Init ──────────────────────────────────────────────────
 const app      = initializeApp(firebaseConfig);
 const auth     = getAuth(app);
 const db       = getFirestore(app);
-const provider = new GoogleAuthProvider();
+
 
 let dataCRC = [], dataUSD = [];
 let draggedItem = null, dragSrcType = '';
 let isSaving = false;
 let currentUser = null;
-let isEditor = false;
-let isReadOnly = true;
-
-// ── Auth state ────────────────────────────────────────────
-onAuthStateChanged(auth, async (user) => {
-    currentUser = user;
-    if (user && !user.isAnonymous) {
-        isEditor = EDITORS.map(e=>e.toLowerCase()).includes(user.email.toLowerCase());
-        isReadOnly = !isEditor;
-        renderAuthBar(user);
-    } else {
-        isReadOnly = true;
-        renderLoginBtn();
-    }
-    applyReadOnly();
-});
+let isReadOnly = false;
 
 async function startSync() {
     await signInAnonymously(auth);
-    const docRef = doc(db, 'flujo_caja_v2', DOCUMENT_ID);
+    const docRef = doc(db, 'flujo_caja', DOCUMENT_ID);
     onSnapshot(docRef, (snap) => {
         if (snap.exists() && !isSaving) {
             const d = snap.data();
@@ -550,6 +499,7 @@ async function startSync() {
             saveToCloud();
         }
     }, () => setSyncStatus('Error de conexión', '#ef4444'));
+    setSyncStatus('Sincronizado', '#22c55e');
 }
 
 // ── Save ──────────────────────────────────────────────────
@@ -565,7 +515,7 @@ window.saveToCloud = async () => {
         lastUpdate:   new Date().toISOString()
     };
     try {
-        await setDoc(doc(db, 'flujo_caja_v2', DOCUMENT_ID), state);
+        await setDoc(doc(db, 'flujo_caja', DOCUMENT_ID), state);
         setTimeout(() => { isSaving = false; }, 800);
         setSyncStatus('Sincronizado', '#22c55e');
     } catch(e) {
@@ -575,48 +525,7 @@ window.saveToCloud = async () => {
     updateCalculations();
 };
 
-// ── Auth UI ───────────────────────────────────────────────
-window.loginWithGoogle = async () => {
-    try { await signInWithPopup(auth, provider); }
-    catch(e) { showToast('Error al iniciar sesión'); }
-};
-window.logoutUser = async () => {
-    await signOut(auth);
-    await signInAnonymously(auth);
-    showToast('Sesión cerrada');
-};
 
-function renderAuthBar(user) {
-    const el = document.getElementById('authArea');
-    const initials = user.displayName ? user.displayName.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase() : '?';
-    el.innerHTML = `
-        <div class="auth-bar">
-            <div class="auth-avatar">${user.photoURL ? `<img src="${user.photoURL}" class="w-7 h-7 rounded-full">` : initials}</div>
-            <div class="hide-mobile">
-                <div class="auth-name">${user.displayName || user.email}</div>
-                <div class="auth-role">${isEditor ? '✏️ Editor' : '👁 Solo lectura'}</div>
-            </div>
-            <button onclick="logoutUser()" class="ml-1 text-xs" style="color:rgba(255,255,255,0.4);hover:color:#fff">
-                <i data-lucide="log-out" class="w-4 h-4"></i>
-            </button>
-        </div>`;
-    lucide.createIcons();
-}
-function renderLoginBtn() {
-    document.getElementById('authArea').innerHTML = `
-        <button onclick="loginWithGoogle()" class="btn-ghost text-xs">
-            <i data-lucide="log-in" class="w-4 h-4"></i>
-            <span class="hide-mobile">Iniciar sesión</span>
-        </button>`;
-    lucide.createIcons();
-}
-
-function applyReadOnly() {
-    document.getElementById('readonlyBanner').style.display = isReadOnly ? 'block' : 'none';
-    const inputs = document.querySelectorAll('input:not(#exchangeRate-view), button[data-edit]');
-    // Block add/remove buttons visually — handled in render
-    renderTables();
-}
 
 // ── Sync status ───────────────────────────────────────────
 function setSyncStatus(text, color, pulse=false) {
