@@ -6,6 +6,12 @@
     <title>Flujo de Caja v2</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiRmx1am8gZGUgQ2FqYSIsInNob3J0X25hbWUiOiJGbHVqbyBDYWphIiwic3RhcnRfdXJsIjoiLiIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiNmMGY0ZjgiLCJ0aGVtZV9jb2xvciI6IiMxYTNhNmMiLCJpY29ucyI6W3sic3JjIjoiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCx7aWNvbn0iLCJzaXplcyI6IjUxMng1MTIiLCJ0eXBlIjoiaW1hZ2Uvc3ZnK3htbCJ9XX0=">
+    <meta name="theme-color" content="#1a3a6c">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Flujo Caja">
+    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICA8cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjEwMCIgZmlsbD0iIzFhM2E2YyIvPgogIDxyZWN0IHg9IjgwIiB5PSIxNjAiIHdpZHRoPSIzNTIiIGhlaWdodD0iMjQwIiByeD0iMjQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzYwYTVmYSIgc3Ryb2tlLXdpZHRoPSIyMCIvPgogIDxyZWN0IHg9IjgwIiB5PSIyMDAiIHdpZHRoPSIzNTIiIGhlaWdodD0iNjAiIGZpbGw9IiMyNTYzZWIiLz4KICA8Y2lyY2xlIGN4PSIxNDAiIGN5PSIyMzAiIHI9IjE4IiBmaWxsPSIjNjBhNWZhIi8+CiAgPGNpcmNsZSBjeD0iMTk2IiBjeT0iMjMwIiByPSIxOCIgZmlsbD0iIzkzYzVmZCIvPgogIDxyZWN0IHg9IjEyMCIgeT0iMzAwIiB3aWR0aD0iODAiIGhlaWdodD0iMTQiIHJ4PSI3IiBmaWxsPSIjM2I4MmY2Ii8+CiAgPHJlY3QgeD0iMTIwIiB5PSIzMjYiIHdpZHRoPSI1NiIgaGVpZ2h0PSIxNCIgcng9IjciIGZpbGw9IiMyNTYzZWIiLz4KICA8cmVjdCB4PSIyNDAiIHk9IjMwMCIgd2lkdGg9IjgwIiBoZWlnaHQ9IjE0IiByeD0iNyIgZmlsbD0iIzNiODJmNiIvPgogIDxyZWN0IHg9IjI0MCIgeT0iMzI2IiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjE0IiByeD0iNyIgZmlsbD0iIzI1NjNlYiIvPgogIDxyZWN0IHg9IjM0MCIgeT0iMzAwIiB3aWR0aD0iNjAiIGhlaWdodD0iNDAiIHJ4PSI3IiBmaWxsPSIjMWQ0ZWQ4Ii8+CiAgPHRleHQgeD0iMzcwIiB5PSIzMjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC13ZWlnaHQ9ImJvbGQiIGZvbnQtc2l6ZT0iMjIiIGZpbGw9IiM5M2M1ZmQiIHRleHQtYW5jaG9yPSJtaWRkbGUiPiQ8L3RleHQ+Cjwvc3ZnPgo=">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -182,8 +188,24 @@
 
         /* ── Print / export ── */
         #export-area {
-            background: #fff;
+            background: #f0f4f8;
         }
+        /* ── Desktop table improvements ── */
+        @media (min-width: 1024px) {
+            thead th { padding: 12px 14px; font-size: 11px; }
+            tbody td { padding: 10px 14px; }
+            .cell-input { font-size: 14px; }
+            .amount-input { width: 110px; }
+        }
+        @media (min-width: 1280px) {
+            thead th { padding: 13px 16px; }
+            tbody td { padding: 11px 16px; }
+        }
+        /* Concept column gets priority space */
+        table th:nth-child(3), table td:nth-child(3) { width: 99%; }
+        table th:nth-child(2), table td:nth-child(2) { white-space: nowrap; }
+        table th:nth-child(4), table td:nth-child(4) { white-space: nowrap; }
+        table th:nth-child(6), table td:nth-child(6) { white-space: nowrap; }
     </style>
 </head>
 <body>
@@ -291,6 +313,12 @@
                 <span class="hide-mobile">Exportar</span>
             </button>
 
+            <!-- Install PWA -->
+            <button id="installBtn" onclick="installPWA()" class="btn-ghost text-xs" style="display:none">
+                <i data-lucide="smartphone" class="w-4 h-4"></i>
+                <span class="hide-mobile">Instalar app</span>
+            </button>
+
             <!-- Share -->
             <button onclick="copyShareLink()" class="btn-primary text-xs">
                 <i data-lucide="share-2" class="w-4 h-4"></i>
@@ -304,7 +332,7 @@
 
 <!-- ══ MAIN CONTENT ══ -->
 <div id="export-area">
-<div class="max-w-5xl mx-auto px-3 py-5 space-y-5">
+<div class="max-w-[1600px] mx-auto px-4 py-5 space-y-5">
 
     <!-- Fondo inicial strip -->
     <div class="card">
@@ -337,7 +365,7 @@
     </div>
 
     <!-- Tables grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
 
         <!-- CRC -->
         <div class="card flex flex-col">
@@ -435,7 +463,7 @@
 </div>
 </div><!-- end export-area -->
 
-<div class="max-w-5xl mx-auto px-3 pb-8">
+<div class="max-w-[1600px] mx-auto px-4 pb-8">
     <p class="text-center text-xs text-gray-400">Flujo de Caja v2 · Sincronización en tiempo real · <a href="#" onclick="copyShareLink()" class="text-blue-400 hover:underline">Compartir enlace</a></p>
 </div>
 
@@ -591,9 +619,13 @@ window.closeExportModal = () => document.getElementById('exportModal').style.dis
 window.exportJPG = async () => {
     closeExportModal();
     showToast('Generando imagen...');
-    await new Promise(r=>setTimeout(r,300));
-    const canvas = await html2canvas(document.getElementById('export-area'), {
-        scale: 2, useCORS: true, backgroundColor: '#f0f4f8'
+    await new Promise(r=>setTimeout(r,400));
+    const area = document.getElementById('export-area');
+    const canvas = await html2canvas(area, {
+        scale: 2, useCORS: true, backgroundColor: '#f0f4f8',
+        width: area.scrollWidth, height: area.scrollHeight,
+        windowWidth: area.scrollWidth, windowHeight: area.scrollHeight,
+        scrollX: 0, scrollY: 0
     });
     const link = document.createElement('a');
     link.download = 'flujo-de-caja.jpg';
@@ -605,15 +637,20 @@ window.exportJPG = async () => {
 window.exportPDF = async () => {
     closeExportModal();
     showToast('Generando PDF...');
-    await new Promise(r=>setTimeout(r,300));
-    const canvas = await html2canvas(document.getElementById('export-area'), {
-        scale: 2, useCORS: true, backgroundColor: '#f0f4f8'
+    await new Promise(r=>setTimeout(r,400));
+    const area = document.getElementById('export-area');
+    const canvas = await html2canvas(area, {
+        scale: 2, useCORS: true, backgroundColor: '#f0f4f8',
+        width: area.scrollWidth, height: area.scrollHeight,
+        windowWidth: area.scrollWidth, windowHeight: area.scrollHeight,
+        scrollX: 0, scrollY: 0
     });
     const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
     const imgW = 210;
     const imgH = (canvas.height * imgW) / canvas.width;
-    pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, imgW, imgH);
+    const orientation = imgH > 297 ? 'portrait' : 'portrait';
+    const pdf = new jsPDF({ orientation, unit: 'mm', format: imgH > 297 ? [imgW, imgH] : 'a4' });
+    pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, imgW, imgH > 297 ? imgH : imgH);
     pdf.save('flujo-de-caja.pdf');
     showToast('¡PDF descargado!');
 };
@@ -753,6 +790,35 @@ function setFinal(id, labelId, val, sym) {
 
 // ── Boot ──────────────────────────────────────────────────
 window.onload = () => { startSync(); lucide.createIcons(); };
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        // inline SW for offline support
+        const sw = `
+self.addEventListener('fetch', e => {
+    e.respondWith(fetch(e.request).catch(() => new Response('Offline')));
+});`;
+        const blob = new Blob([sw], {type: 'application/javascript'});
+        navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{});
+    });
+}
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    const btn = document.getElementById('installBtn');
+    if (btn) btn.style.display = 'flex';
+});
+window.installPWA = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    const btn = document.getElementById('installBtn');
+    if (btn) btn.style.display = 'none';
+};
 </script>
 </body>
 </html>
