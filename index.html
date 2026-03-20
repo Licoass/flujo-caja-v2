@@ -201,11 +201,13 @@
             thead th { padding: 13px 16px; }
             tbody td { padding: 11px 16px; }
         }
-        /* Concept column gets priority space */
-        table th:nth-child(3), table td:nth-child(3) { width: 99%; }
-        table th:nth-child(2), table td:nth-child(2) { white-space: nowrap; }
-        table th:nth-child(4), table td:nth-child(4) { white-space: nowrap; }
-        table th:nth-child(6), table td:nth-child(6) { white-space: nowrap; }
+        /* Column sizing - prevent truncation */
+        table { table-layout: auto; }
+        table th:nth-child(2), table td:nth-child(2) { white-space: nowrap; min-width: 96px; }
+        table th:nth-child(3), table td:nth-child(3) { white-space: nowrap; }
+        table th:nth-child(4), table td:nth-child(4) { white-space: nowrap; min-width: 100px; }
+        table th:nth-child(6), table td:nth-child(6) { white-space: nowrap; min-width: 90px; }
+        .cell-input { white-space: nowrap; overflow: visible; }
     </style>
 </head>
 <body>
@@ -619,14 +621,25 @@ window.closeExportModal = () => document.getElementById('exportModal').style.dis
 window.exportJPG = async () => {
     closeExportModal();
     showToast('Generando imagen...');
+    // Expand all table wrappers temporarily so nothing clips
+    const tableWraps = document.querySelectorAll('.table-wrap');
+    const origStyles = [];
+    tableWraps.forEach(tw => {
+        origStyles.push(tw.style.cssText);
+        tw.style.overflow = 'visible';
+        tw.style.height = 'auto';
+        tw.style.maxHeight = 'none';
+    });
     await new Promise(r=>setTimeout(r,400));
     const area = document.getElementById('export-area');
     const canvas = await html2canvas(area, {
         scale: 2, useCORS: true, backgroundColor: '#f0f4f8',
         width: area.scrollWidth, height: area.scrollHeight,
-        windowWidth: area.scrollWidth, windowHeight: area.scrollHeight,
-        scrollX: 0, scrollY: 0
+        windowWidth: document.body.scrollWidth,
+        scrollX: -window.scrollX, scrollY: -window.scrollY,
+        ignoreElements: el => el.id === 'exportModal' || el.id === 'importModal' || el.id === 'toast'
     });
+    tableWraps.forEach((tw, i) => tw.style.cssText = origStyles[i]);
     const link = document.createElement('a');
     link.download = 'flujo-de-caja.jpg';
     link.href = canvas.toDataURL('image/jpeg', 0.95);
@@ -637,20 +650,29 @@ window.exportJPG = async () => {
 window.exportPDF = async () => {
     closeExportModal();
     showToast('Generando PDF...');
+    const tableWraps = document.querySelectorAll('.table-wrap');
+    const origStyles = [];
+    tableWraps.forEach(tw => {
+        origStyles.push(tw.style.cssText);
+        tw.style.overflow = 'visible';
+        tw.style.height = 'auto';
+        tw.style.maxHeight = 'none';
+    });
     await new Promise(r=>setTimeout(r,400));
     const area = document.getElementById('export-area');
     const canvas = await html2canvas(area, {
         scale: 2, useCORS: true, backgroundColor: '#f0f4f8',
         width: area.scrollWidth, height: area.scrollHeight,
-        windowWidth: area.scrollWidth, windowHeight: area.scrollHeight,
-        scrollX: 0, scrollY: 0
+        windowWidth: document.body.scrollWidth,
+        scrollX: -window.scrollX, scrollY: -window.scrollY,
+        ignoreElements: el => el.id === 'exportModal' || el.id === 'importModal' || el.id === 'toast'
     });
+    tableWraps.forEach((tw, i) => tw.style.cssText = origStyles[i]);
     const { jsPDF } = window.jspdf;
     const imgW = 210;
     const imgH = (canvas.height * imgW) / canvas.width;
-    const orientation = imgH > 297 ? 'portrait' : 'portrait';
-    const pdf = new jsPDF({ orientation, unit: 'mm', format: imgH > 297 ? [imgW, imgH] : 'a4' });
-    pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, imgW, imgH > 297 ? imgH : imgH);
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: imgH > 280 ? [imgW, imgH] : 'a4' });
+    pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, imgW, imgH);
     pdf.save('flujo-de-caja.pdf');
     showToast('¡PDF descargado!');
 };
@@ -712,8 +734,8 @@ function renderBody(type, data, elId, sym) {
 
         tr.innerHTML = `
             <td class="drag-handle px-1"><i data-lucide="grip-vertical" class="w-3.5 h-3.5"></i></td>
-            <td><input type="date" value="${item.date}" ${isReadOnly?'disabled':''} onchange="updateItem('${type}',${item.id},'date',this.value)" class="cell-input text-xs"></td>
-            <td><input type="text" value="${escHtml(item.concept)}" ${isReadOnly?'disabled':''} onchange="updateItem('${type}',${item.id},'concept',this.value)" class="cell-input text-sm font-500" style="min-width:100px"></td>
+            <td><input type="date" value="${item.date}" ${isReadOnly?'disabled':''} onchange="updateItem('${type}',${item.id},'date',this.value)" class="cell-input text-xs" style="min-width:105px"></td>
+            <td><input type="text" value="${escHtml(item.concept)}" ${isReadOnly?'disabled':''} onchange="updateItem('${type}',${item.id},'concept',this.value)" class="cell-input text-sm font-500" style="min-width:120px;white-space:nowrap"></td>
             <td class="text-right">
                 <div class="flex items-center justify-end gap-0.5">
                     <span class="text-gray-300 text-xs">${sym}</span>
@@ -793,32 +815,38 @@ window.onload = () => { startSync(); lucide.createIcons(); };
 </script>
 
 <script>
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        // inline SW for offline support
-        const sw = `
-self.addEventListener('fetch', e => {
-    e.respondWith(fetch(e.request).catch(() => new Response('Offline')));
-});`;
-        const blob = new Blob([sw], {type: 'application/javascript'});
-        navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{});
-    });
-}
+// PWA install — Chrome on Android shows native prompt
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
     const btn = document.getElementById('installBtn');
-    if (btn) btn.style.display = 'flex';
+    if (btn) { btn.style.display = 'flex'; }
+});
+window.addEventListener('appinstalled', () => {
+    const btn = document.getElementById('installBtn');
+    if (btn) btn.style.display = 'none';
+    deferredPrompt = null;
 });
 window.installPWA = async () => {
-    if (!deferredPrompt) return;
+    if (!deferredPrompt) {
+        // Fallback: show instructions
+        alert('Para instalar:\n\niOS Safari: Compartir → Agregar a inicio\nAndroid Chrome: Menú (⋮) → Agregar a pantalla de inicio');
+        return;
+    }
     deferredPrompt.prompt();
-    await deferredPrompt.userChoice;
+    const { outcome } = await deferredPrompt.userChoice;
     deferredPrompt = null;
     const btn = document.getElementById('installBtn');
     if (btn) btn.style.display = 'none';
 };
+// Show install button always so users know it exists
+window.addEventListener('load', () => {
+    const btn = document.getElementById('installBtn');
+    if (btn && !window.matchMedia('(display-mode: standalone)').matches) {
+        btn.style.display = 'flex';
+    }
+});
 </script>
 </body>
 </html>
