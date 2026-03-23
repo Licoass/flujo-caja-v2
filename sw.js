@@ -1,5 +1,5 @@
 // Cambia este número cada vez que subas una versión nueva
-const CACHE_VERSION = 'flujo-caja-v8';
+const CACHE_VERSION = 'flujo-caja-v11';
 
 self.addEventListener('install', e => {
     self.skipWaiting(); // activa inmediatamente sin esperar
