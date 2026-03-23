@@ -18,201 +18,89 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         * { font-family: 'Plus Jakarta Sans', sans-serif; }
-
         :root {
-            --blue-950: #0a1628;
-            --blue-900: #0f2340;
-            --blue-800: #1a3a6c;
-            --blue-700: #1e4d9c;
-            --blue-600: #2563eb;
-            --blue-500: #3b82f6;
-            --blue-400: #60a5fa;
-            --blue-100: #dbeafe;
-            --blue-50:  #eff6ff;
+            --blue-950: #0a1628; --blue-800: #1a3a6c;
+            --blue-700: #1e4d9c; --blue-600: #2563eb; --blue-400: #60a5fa;
         }
-
         body { background: #f0f4f8; min-height: 100vh; }
 
-        /* ── Header ── */
-        .app-header {
-            background: linear-gradient(135deg, var(--blue-950) 0%, var(--blue-800) 100%);
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-        }
-        .app-header h1 { color: #fff; letter-spacing: -0.5px; }
-        .version-badge {
-            background: rgba(255,255,255,0.12);
-            color: var(--blue-200, #bfdbfe);
-            font-size: 10px; font-weight: 700;
-            padding: 2px 8px; border-radius: 20px;
-            letter-spacing: 0.08em; text-transform: uppercase;
-        }
-
-        /* ── Buttons ── */
-        .btn-primary {
-            background: var(--blue-600);
-            color: #fff; font-weight: 600; font-size: 13px;
-            padding: 8px 16px; border-radius: 8px;
-            display: flex; align-items: center; gap: 6px;
-            transition: background 0.15s, transform 0.1s;
-            white-space: nowrap;
-        }
-        .btn-primary:hover { background: var(--blue-700); transform: translateY(-1px); }
-        .btn-ghost {
-            background: rgba(255,255,255,0.1);
-            color: #fff; font-weight: 600; font-size: 13px;
-            padding: 8px 16px; border-radius: 8px;
-            display: flex; align-items: center; gap: 6px;
-            transition: background 0.15s;
-            white-space: nowrap;
-        }
+        .app-header { background: linear-gradient(135deg, var(--blue-950) 0%, var(--blue-800) 100%); border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .version-badge { background: rgba(255,255,255,0.12); color: #bfdbfe; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; letter-spacing: 0.08em; text-transform: uppercase; }
+        .btn-primary { background: var(--blue-600); color: #fff; font-weight: 600; font-size: 13px; padding: 8px 16px; border-radius: 8px; display: flex; align-items: center; gap: 6px; transition: background 0.15s; white-space: nowrap; }
+        .btn-primary:hover { background: var(--blue-700); }
+        .btn-ghost { background: rgba(255,255,255,0.1); color: #fff; font-weight: 600; font-size: 13px; padding: 8px 16px; border-radius: 8px; display: flex; align-items: center; gap: 6px; transition: background 0.15s; white-space: nowrap; }
         .btn-ghost:hover { background: rgba(255,255,255,0.18); }
-        .btn-danger {
-            color: #ef4444; padding: 4px;
-            border-radius: 6px; transition: background 0.15s;
-        }
-        .btn-danger:hover { background: #fef2f2; }
+        .card { background: #fff; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.06); overflow: hidden; }
+        .card-header-blue { background: linear-gradient(135deg, var(--blue-800) 0%, var(--blue-700) 100%); padding: 14px 20px; }
+        .rate-box { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.18); border-radius: 10px; padding: 8px 14px; }
 
-        /* ── Cards ── */
-        .card {
-            background: #fff;
-            border-radius: 16px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
-            border: 1px solid rgba(0,0,0,0.06);
-            overflow: hidden;
-        }
-        .card-header-blue {
-            background: linear-gradient(135deg, var(--blue-800) 0%, var(--blue-700) 100%);
-            padding: 16px 20px;
-        }
-
-        /* ── Exchange rate ── */
-        .rate-box {
-            background: rgba(255,255,255,0.12);
-            border: 1px solid rgba(255,255,255,0.18);
-            border-radius: 10px; padding: 8px 14px;
-        }
-
-        /* ── Table ── */
+        /* Table */
         .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        table { width: 100%; border-collapse: collapse; }
-        thead th {
-            font-size: 11px; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 0.06em; color: #64748b;
-            padding: 10px 10px; background: #f8fafc;
-            border-bottom: 1px solid #e2e8f0;
-        }
+        table { width: 100%; border-collapse: collapse; table-layout: auto; }
+        thead th { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #64748b; padding: 10px 12px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
         tbody tr { border-bottom: 1px solid #f1f5f9; transition: background 0.1s; }
         tbody tr:hover { background: #f0f7ff; }
-        tbody td { padding: 8px 10px; }
+        tbody tr.selected-row { background: #eff6ff !important; }
+        tbody td { padding: 8px 12px; }
         .drag-handle { color: #cbd5e1; cursor: grab; }
         tbody tr:hover .drag-handle { color: var(--blue-400); }
-        .dragging { opacity: 0.4; background: #eff6ff !important; }
-        .drag-over { border-top: 2px solid var(--blue-500) !important; }
+        .dragging { opacity: 0.4; }
+        .drag-over { border-top: 2px solid var(--blue-600) !important; }
 
-        /* ── Inputs inside table ── */
-        .cell-input {
-            background: transparent; border: none; outline: none;
-            width: 100%; font-family: inherit; font-size: 13px; color: #1e293b;
-        }
-        .cell-input:focus {
-            background: #eff6ff; border-radius: 6px; padding: 2px 6px;
-        }
-        .amount-input { text-align: right; width: 90px; }
+        .cell-input { background: transparent; border: none; outline: none; width: 100%; font-family: inherit; font-size: 13px; color: #1e293b; }
+        .cell-input:focus { background: #eff6ff; border-radius: 6px; padding: 2px 6px; }
+        .amount-input { text-align: right; width: 100px; }
 
-        /* ── Balance colors ── */
-        .bal-pos { color: #2563eb; font-weight: 700; font-family: 'Plus Jakarta Sans', monospace; }
-        .bal-neg { color: #ef4444; font-weight: 700; font-family: 'Plus Jakarta Sans', monospace; }
+        .badge-crc { background: #dcfce7; color: #15803d; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 20px; white-space: nowrap; display: inline-block; }
+        .badge-usd { background: #dbeafe; color: #1d4ed8; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 20px; white-space: nowrap; display: inline-block; }
 
-        /* ── Footer summary ── */
-        .summary-row {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 8px 20px;
-        }
-        .summary-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #94a3b8; }
-        .summary-value { font-size: 14px; font-weight: 700; }
+        .bal-pos { color: #2563eb; font-weight: 700; }
+        .bal-neg { color: #ef4444; font-weight: 700; }
 
-        /* ── Global balance ── */
-        .global-card {
-            background: linear-gradient(135deg, var(--blue-950) 0%, var(--blue-800) 100%);
-            border-radius: 20px;
-            padding: 32px;
-            text-align: center;
-            box-shadow: 0 8px 32px rgba(10,22,40,0.25);
-        }
-        .global-amount {
-            font-size: clamp(36px, 8vw, 56px);
-            font-weight: 800; color: #fff;
-            letter-spacing: -2px; line-height: 1;
-        }
+        /* Funds panel */
+        .funds-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; }
+        @media (max-width: 640px) { .funds-grid { grid-template-columns: 1fr; } }
+        .fund-box { padding: 18px 22px; border-right: 1px solid #f1f5f9; }
+        .fund-box:last-child { border-right: none; }
+        .fund-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; margin-bottom: 4px; }
+        .fund-value { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+        .fund-value.pos { color: #1d4ed8; }
+        .fund-value.neg { color: #ef4444; }
+        .fund-value.global { font-size: 28px; color: #0f172a; }
+        .fund-value.global.neg { color: #ef4444; }
+
+        /* Payment panel */
+        .pay-panel { background: linear-gradient(135deg, #0f2340 0%, #1a3a6c 100%); border-radius: 16px; padding: 22px 24px; box-shadow: 0 8px 24px rgba(10,22,40,0.2); }
+        .pay-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+        @media (max-width: 640px) { .pay-grid { grid-template-columns: 1fr; gap: 10px; } }
+        .pay-box { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 14px 18px; }
+        .pay-box.highlight { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.25); }
+        .pay-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.45); margin-bottom: 4px; }
+        .pay-value { font-size: 22px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+        .pay-value.zero { color: rgba(255,255,255,0.28); }
+        .pay-count { font-size: 11px; color: rgba(255,255,255,0.38); margin-top: 3px; }
+
+        /* Global */
+        .global-card { background: linear-gradient(135deg, var(--blue-950) 0%, var(--blue-800) 100%); border-radius: 20px; padding: 28px 32px; text-align: center; box-shadow: 0 8px 32px rgba(10,22,40,0.25); }
+        .global-amount { font-size: clamp(32px, 7vw, 52px); font-weight: 800; color: #fff; letter-spacing: -2px; line-height: 1; }
         .global-amount.negative { color: #fca5a5; }
-        .global-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(255,255,255,0.5); margin-bottom: 8px; }
+        .global-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(255,255,255,0.45); margin-bottom: 6px; }
 
-
-
-        /* ── Sync dot ── */
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
         .syncing { animation: pulse 1.2s infinite; }
 
-        /* ── Modal ── */
-        .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-            display: flex; align-items: center; justify-content: center;
-            z-index: 1000; padding: 16px;
-            backdrop-filter: blur(4px);
-        }
-        .modal-box {
-            background: #fff; border-radius: 16px;
-            padding: 28px; max-width: 480px; width: 100%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-        }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 16px; backdrop-filter: blur(4px); }
+        .modal-box { background: #fff; border-radius: 16px; padding: 28px; max-width: 480px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
 
-        /* ── Toast ── */
-        .toast {
-            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-            background: #1e293b; color: #fff;
-            padding: 12px 20px; border-radius: 10px;
-            font-size: 13px; font-weight: 600;
-            z-index: 2000; opacity: 0; transition: opacity 0.3s;
-            pointer-events: none; white-space: nowrap;
-        }
+        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #1e293b; color: #fff; padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; z-index: 2000; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
         .toast.show { opacity: 1; }
 
-
-
-        /* ── Mobile tweaks ── */
-        @media (max-width: 640px) {
-            .hide-mobile { display: none !important; }
-            thead th, tbody td { padding: 6px 6px; }
-            .cell-input { font-size: 12px; }
-        }
-
-        /* ── Print / export ── */
-        #export-area {
-            background: #f0f4f8;
-        }
-        /* ── Desktop table improvements ── */
-        @media (min-width: 1024px) {
-            thead th { padding: 12px 14px; font-size: 11px; }
-            tbody td { padding: 10px 14px; }
-            .cell-input { font-size: 14px; }
-            .amount-input { width: 110px; }
-        }
-        @media (min-width: 1280px) {
-            thead th { padding: 13px 16px; }
-            tbody td { padding: 11px 16px; }
-        }
-        /* Column sizing - prevent truncation */
-        table { table-layout: auto; }
-        table th:nth-child(2), table td:nth-child(2) { white-space: nowrap; min-width: 96px; }
-        table th:nth-child(3), table td:nth-child(3) { white-space: nowrap; }
-        table th:nth-child(4), table td:nth-child(4) { white-space: nowrap; min-width: 100px; }
-        table th:nth-child(6), table td:nth-child(6) { white-space: nowrap; min-width: 90px; }
-        .cell-input { white-space: nowrap; overflow: visible; }
+        @media (max-width: 640px) { .hide-mobile { display: none !important; } thead th, tbody td { padding: 6px 8px; } }
+        @media (min-width: 1024px) { thead th { padding: 12px 14px; } tbody td { padding: 10px 14px; } }
     </style>
 </head>
 <body>
 
-<!-- Toast -->
 <div id="toast" class="toast"></div>
 
 <!-- Import Modal -->
@@ -222,15 +110,15 @@
             <h3 class="text-lg font-bold text-gray-800">Importar movimientos</h3>
             <button onclick="closeImportModal()" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
         </div>
-        <p class="text-sm text-gray-500 mb-4">Selecciona a qué tabla importar y pega los datos. El formato esperado es una fila por línea con columnas separadas por tabulación o coma:</p>
-        <code class="block text-xs bg-gray-50 rounded-lg p-3 mb-4 text-gray-600">fecha, concepto, monto<br>2025-01-15, Alquiler, 500000<br>2025-01-20, Servicios, 75000</code>
+        <p class="text-sm text-gray-500 mb-3">Formato por línea: <code class="bg-gray-100 px-1 rounded text-xs">fecha, concepto, monto</code></p>
+        <code class="block text-xs bg-gray-50 rounded-lg p-3 mb-4 text-gray-600">2025-01-15, Alquiler, 500000<br>2025-01-20, Servicios, 75000</code>
         <div class="flex gap-2 mb-3">
-            <button onclick="setImportType('CRC')" id="importBtnCRC" class="flex-1 py-2 rounded-lg text-sm font-700 border-2 border-blue-600 text-blue-600 font-bold transition-all">₡ Colones</button>
-            <button onclick="setImportType('USD')" id="importBtnUSD" class="flex-1 py-2 rounded-lg text-sm font-700 border-2 border-gray-200 text-gray-400 font-bold transition-all">$ Dólares</button>
+            <button onclick="setImportType('CRC')" id="importBtnCRC" class="flex-1 py-2 rounded-lg text-sm border-2 border-blue-600 text-blue-600 font-bold bg-blue-50">₡ Colones</button>
+            <button onclick="setImportType('USD')" id="importBtnUSD" class="flex-1 py-2 rounded-lg text-sm border-2 border-gray-200 text-gray-400 font-bold">$ Dólares</button>
         </div>
         <textarea id="importText" rows="6" placeholder="Pega tus datos aquí..." class="w-full border border-gray-200 rounded-lg p-3 text-sm font-mono focus:outline-none focus:border-blue-400 resize-none"></textarea>
         <div class="flex gap-2 mt-4">
-            <button onclick="closeImportModal()" class="flex-1 py-2 rounded-lg border border-gray-200 text-sm font-600 text-gray-500 hover:bg-gray-50">Cancelar</button>
+            <button onclick="closeImportModal()" class="flex-1 py-2 rounded-lg border border-gray-200 text-sm text-gray-500 hover:bg-gray-50">Cancelar</button>
             <button onclick="processImport()" class="flex-1 py-2 rounded-lg bg-blue-600 text-white text-sm font-bold hover:bg-blue-700">Importar</button>
         </div>
     </div>
@@ -245,42 +133,31 @@
         </div>
         <div class="grid grid-cols-2 gap-3">
             <button onclick="exportPDF()" class="flex flex-col items-center gap-3 p-6 rounded-xl border-2 border-gray-100 hover:border-blue-400 hover:bg-blue-50 transition-all group">
-                <div class="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center group-hover:bg-red-100 transition-all">
+                <div class="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center group-hover:bg-red-100">
                     <i data-lucide="file-text" class="w-6 h-6 text-red-500"></i>
                 </div>
-                <div class="text-center">
-                    <div class="font-bold text-gray-800 text-sm">Exportar PDF</div>
-                    <div class="text-xs text-gray-400 mt-1">Documento listo para imprimir</div>
-                </div>
+                <div class="text-center"><div class="font-bold text-gray-800 text-sm">PDF</div><div class="text-xs text-gray-400 mt-1">Para imprimir</div></div>
             </button>
             <button onclick="exportJPG()" class="flex flex-col items-center gap-3 p-6 rounded-xl border-2 border-gray-100 hover:border-blue-400 hover:bg-blue-50 transition-all group">
-                <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center group-hover:bg-blue-100 transition-all">
+                <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center group-hover:bg-blue-100">
                     <i data-lucide="image" class="w-6 h-6 text-blue-500"></i>
                 </div>
-                <div class="text-center">
-                    <div class="font-bold text-gray-800 text-sm">Exportar JPG</div>
-                    <div class="text-xs text-gray-400 mt-1">Imagen para compartir</div>
-                </div>
+                <div class="text-center"><div class="font-bold text-gray-800 text-sm">JPG</div><div class="text-xs text-gray-400 mt-1">Para compartir</div></div>
             </button>
         </div>
-        <p class="text-xs text-gray-400 text-center mt-4">Se exporta la vista completa del reporte</p>
     </div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     APP
-═══════════════════════════════════════════ -->
+<!-- ═══ HEADER ═══ -->
 <div class="app-header px-4 py-4 sticky top-0 z-50">
-    <div class="max-w-5xl mx-auto flex flex-wrap items-center justify-between gap-3">
-
-        <!-- Logo + title -->
+    <div class="max-w-[1600px] mx-auto flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-3">
             <div style="background:rgba(255,255,255,0.12);border-radius:10px;padding:8px;">
                 <i data-lucide="bar-chart-2" class="w-5 h-5 text-white"></i>
             </div>
             <div>
                 <div class="flex items-center gap-2">
-                    <h1 class="text-base font-800" style="color:#fff;font-weight:800;">Flujo de Caja</h1>
+                    <h1 class="text-base" style="color:#fff;font-weight:800;">Flujo de Caja</h1>
                     <span class="version-badge">v2</span>
                 </div>
                 <div id="syncStatus" class="flex items-center gap-1.5 text-xs" style="color:rgba(255,255,255,0.5)">
@@ -289,12 +166,7 @@
                 </div>
             </div>
         </div>
-
-        <!-- Actions -->
         <div class="flex items-center gap-2 flex-wrap">
-
-
-            <!-- T.C. -->
             <div class="rate-box flex items-center gap-2">
                 <span style="color:rgba(255,255,255,0.5);font-size:11px;font-weight:700;">T.C.</span>
                 <span style="color:rgba(255,255,255,0.6);font-size:12px;">₡</span>
@@ -302,186 +174,137 @@
                     style="background:transparent;border:none;color:#fff;font-weight:700;font-size:14px;width:64px;outline:none;"
                     onchange="saveToCloud()">
             </div>
-
-            <!-- Import -->
             <button onclick="openImportModal()" class="btn-ghost text-xs">
-                <i data-lucide="upload" class="w-4 h-4"></i>
-                <span class="hide-mobile">Importar</span>
+                <i data-lucide="upload" class="w-4 h-4"></i><span class="hide-mobile">Importar</span>
             </button>
-
-            <!-- Export -->
             <button onclick="openExportModal()" class="btn-ghost text-xs">
-                <i data-lucide="download" class="w-4 h-4"></i>
-                <span class="hide-mobile">Exportar</span>
+                <i data-lucide="download" class="w-4 h-4"></i><span class="hide-mobile">Exportar</span>
             </button>
-
-            <!-- Install PWA -->
             <button id="installBtn" onclick="installPWA()" class="btn-ghost text-xs" style="display:none">
-                <i data-lucide="smartphone" class="w-4 h-4"></i>
-                <span class="hide-mobile">Instalar app</span>
+                <i data-lucide="smartphone" class="w-4 h-4"></i><span class="hide-mobile">Instalar</span>
             </button>
-
-            <!-- Share -->
             <button onclick="copyShareLink()" class="btn-primary text-xs">
-                <i data-lucide="share-2" class="w-4 h-4"></i>
-                <span class="hide-mobile">Compartir</span>
+                <i data-lucide="share-2" class="w-4 h-4"></i><span class="hide-mobile">Compartir</span>
             </button>
         </div>
     </div>
 </div>
 
-
-
-<!-- ══ MAIN CONTENT ══ -->
+<!-- ═══ CONTENIDO ═══ -->
 <div id="export-area">
 <div class="max-w-[1600px] mx-auto px-4 py-5 space-y-5">
 
-    <!-- Fondo inicial strip -->
+    <!-- Panel de fondos disponibles -->
     <div class="card">
-        <div class="grid grid-cols-2 divide-x divide-gray-100">
-            <div class="p-4 flex items-center justify-between gap-2">
-                <div>
-                    <div class="text-xs font-700 text-gray-400 uppercase tracking-wider mb-1">Fondo inicial ₡</div>
-                    <div class="flex items-center gap-1">
-                        <span class="text-gray-400 font-bold">₡</span>
-                        <input type="number" id="initCRC" value="0" class="cell-input text-lg font-bold text-gray-800 w-32" onchange="saveToCloud()">
-                    </div>
+        <div class="funds-grid">
+            <div class="fund-box">
+                <div class="fund-label">Fondo inicial ₡</div>
+                <div class="flex items-center gap-1 mb-3">
+                    <span class="text-gray-300 font-bold">₡</span>
+                    <input type="number" id="initCRC" value="0" class="cell-input text-lg font-bold text-gray-800 w-40" onchange="saveToCloud()">
                 </div>
-                <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:#eff6ff">
-                    <i data-lucide="wallet" class="w-5 h-5" style="color:#2563eb"></i>
-                </div>
+                <div class="fund-label">Disponible en colones</div>
+                <div class="fund-value pos" id="dispCRC">₡0.00</div>
             </div>
-            <div class="p-4 flex items-center justify-between gap-2">
-                <div>
-                    <div class="text-xs font-700 text-gray-400 uppercase tracking-wider mb-1">Fondo inicial $</div>
-                    <div class="flex items-center gap-1">
-                        <span class="text-gray-400 font-bold">$</span>
-                        <input type="number" id="initUSD" value="0" class="cell-input text-lg font-bold text-gray-800 w-28" onchange="saveToCloud()">
-                    </div>
+            <div class="fund-box">
+                <div class="fund-label">Fondo inicial $</div>
+                <div class="flex items-center gap-1 mb-3">
+                    <span class="text-gray-300 font-bold">$</span>
+                    <input type="number" id="initUSD" value="0" class="cell-input text-lg font-bold text-gray-800 w-36" onchange="saveToCloud()">
                 </div>
-                <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:#eff6ff">
-                    <i data-lucide="banknote" class="w-5 h-5" style="color:#2563eb"></i>
-                </div>
+                <div class="fund-label">Disponible en dólares</div>
+                <div class="fund-value pos" id="dispUSD">$0.00</div>
             </div>
-        </div>
-    </div>
-
-    <!-- Tables grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-
-        <!-- CRC -->
-        <div class="card flex flex-col">
-            <div class="card-header-blue flex justify-between items-center">
-                <div class="flex items-center gap-2">
-                    <i data-lucide="wallet" class="w-4 h-4 text-white opacity-80"></i>
-                    <span class="text-white font-bold text-sm tracking-wide">COLONES (CRC)</span>
-                </div>
-            </div>
-            <div class="table-wrap flex-grow">
-                <table>
-                    <thead>
-                        <tr>
-                            <th class="w-6"></th>
-                            <th>Fecha</th>
-                            <th>Concepto</th>
-                            <th class="text-right">Monto</th>
-                            <th class="text-center">✓</th>
-                            <th class="text-right">Saldo</th>
-                            <th class="w-6"></th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableCRC"></tbody>
-                </table>
-            </div>
-            <div class="p-3 border-t border-gray-100">
-                <button onclick="addRow('CRC')" class="flex items-center gap-2 text-blue-600 font-bold hover:bg-blue-50 px-3 py-2 rounded-lg transition-all text-xs w-full">
-                    <i data-lucide="plus" class="w-4 h-4"></i> Agregar movimiento
-                </button>
-            </div>
-            <div class="border-t border-gray-100">
-                <div class="summary-row">
-                    <span class="summary-label">Pendiente</span>
-                    <span class="summary-value text-amber-500" id="pendingCRC">₡0.00</span>
-                </div>
-                <div class="summary-row border-t border-gray-50 py-3">
-                    <span class="summary-label" id="labelFinalCRC">Saldo restante</span>
-                    <span class="text-xl font-800" id="finalCRC" style="font-weight:800">₡0.00</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- USD -->
-        <div class="card flex flex-col">
-            <div class="card-header-blue flex justify-between items-center">
-                <div class="flex items-center gap-2">
-                    <i data-lucide="banknote" class="w-4 h-4 text-white opacity-80"></i>
-                    <span class="text-white font-bold text-sm tracking-wide">DÓLARES (USD)</span>
-                </div>
-            </div>
-            <div class="table-wrap flex-grow">
-                <table>
-                    <thead>
-                        <tr>
-                            <th class="w-6"></th>
-                            <th>Fecha</th>
-                            <th>Concepto</th>
-                            <th class="text-right">Monto</th>
-                            <th class="text-center">✓</th>
-                            <th class="text-right">Saldo</th>
-                            <th class="w-6"></th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableUSD"></tbody>
-                </table>
-            </div>
-            <div class="p-3 border-t border-gray-100">
-                <button onclick="addRow('USD')" class="flex items-center gap-2 text-blue-600 font-bold hover:bg-blue-50 px-3 py-2 rounded-lg transition-all text-xs w-full">
-                    <i data-lucide="plus" class="w-4 h-4"></i> Agregar movimiento
-                </button>
-            </div>
-            <div class="border-t border-gray-100">
-                <div class="summary-row">
-                    <span class="summary-label">Pendiente</span>
-                    <span class="summary-value text-amber-500" id="pendingUSD">$0.00</span>
-                </div>
-                <div class="summary-row border-t border-gray-50 py-3">
-                    <span class="summary-label" id="labelFinalUSD">Saldo restante</span>
-                    <span class="text-xl font-800" id="finalUSD" style="font-weight:800">$0.00</span>
-                </div>
+            <div class="fund-box" style="background:#f8fafc">
+                <div class="fund-label">Total disponible general (USD)</div>
+                <div class="fund-value global" id="dispTotal">$0.00</div>
+                <div class="text-xs text-gray-400 mt-2">Ambos fondos convertidos a USD</div>
             </div>
         </div>
     </div>
 
-    <!-- Global balance -->
+    <!-- Tabla unificada -->
+    <div class="card">
+        <div class="card-header-blue flex justify-between items-center gap-3">
+            <div class="flex items-center gap-2">
+                <i data-lucide="list" class="w-4 h-4 text-white opacity-80"></i>
+                <span class="text-white font-bold text-sm tracking-wide">MOVIMIENTOS</span>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="addRow('CRC')" class="flex items-center gap-1 bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-all">
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i> ₡ Colones
+                </button>
+                <button onclick="addRow('USD')" class="flex items-center gap-1 bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-all">
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i> $ Dólares
+                </button>
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="w-6"></th>
+                        <th>Moneda</th>
+                        <th>Fecha</th>
+                        <th>Concepto</th>
+                        <th class="text-right">Monto</th>
+                        <th class="text-center">A pagar</th>
+                        <th class="text-right">Saldo</th>
+                        <th class="w-8"></th>
+                    </tr>
+                </thead>
+                <tbody id="tableUnified"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Panel selección a pagar -->
+    <div class="pay-panel">
+        <div class="text-xs font-bold uppercase tracking-widest mb-4" style="color:rgba(255,255,255,0.4)">
+            Resumen — movimientos seleccionados a pagar
+        </div>
+        <div class="pay-grid">
+            <div class="pay-box">
+                <div class="pay-label">Subtotal en colones</div>
+                <div class="pay-value zero" id="paySubCRC">₡0.00</div>
+                <div class="pay-count" id="payCountCRC">0 movimientos</div>
+            </div>
+            <div class="pay-box">
+                <div class="pay-label">Subtotal en dólares</div>
+                <div class="pay-value zero" id="paySubUSD">$0.00</div>
+                <div class="pay-count" id="payCountUSD">0 movimientos</div>
+            </div>
+            <div class="pay-box highlight">
+                <div class="pay-label">Total a pagar (USD)</div>
+                <div class="pay-value zero" id="payTotal">$0.00</div>
+                <div class="pay-count" id="payCountTotal">0 movimientos seleccionados</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Balance global total -->
     <div class="global-card">
         <div class="global-label" id="labelGlobal">Saldo total proyectado (USD)</div>
         <div class="global-amount" id="totalConsolidated">$0.00</div>
-        <div class="mt-4 flex justify-center gap-6 text-xs" style="color:rgba(255,255,255,0.4)">
-            <span>Tipo de cambio: ₡<span id="tcDisplay">512.00</span></span>
+        <div class="mt-3 flex justify-center gap-6 text-xs" style="color:rgba(255,255,255,0.35)">
+            <span>T.C.: ₡<span id="tcDisplay">512.00</span></span>
             <span id="lastUpdateDisplay"></span>
         </div>
     </div>
 
 </div>
-</div><!-- end export-area -->
-
-<div class="max-w-[1600px] mx-auto px-4 pb-8">
-    <p class="text-center text-xs text-gray-400">Flujo de Caja v2 · Sincronización en tiempo real · <a href="#" onclick="copyShareLink()" class="text-blue-400 hover:underline">Compartir enlace</a></p>
 </div>
 
-<!-- ══════════════════════════════════════════
-     FIREBASE + LOGIC
-═══════════════════════════════════════════ -->
-<script type="module">
-import { initializeApp }          from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { getFirestore, doc, onSnapshot, setDoc, getDoc }
-                                   from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+<div class="max-w-[1600px] mx-auto px-4 pb-8">
+    <p class="text-center text-xs text-gray-400">Flujo de Caja v2 · Sync en tiempo real · <a href="#" onclick="copyShareLink()" class="text-blue-400 hover:underline">Compartir</a></p>
+</div>
 
-// =========================================================
-//  🔧 CONFIGURACIÓN FIREBASE — PEGA TUS DATOS AQUÍ
-//  (Firebase Console → tu proyecto → ⚙️ General → Tus apps)
-// =========================================================
+<!-- ═══ FIREBASE + LÓGICA ═══ -->
+<script type="module">
+import { initializeApp }       from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
 const firebaseConfig = {
     apiKey:            "AIzaSyCASutGTC3bJPsGJHUmxZaHUMDK0isMWiw",
     authDomain:        "flujo-de-caja-d49b8.firebaseapp.com",
@@ -490,31 +313,25 @@ const firebaseConfig = {
     messagingSenderId: "415973787595",
     appId:             "1:415973787595:web:e205a799f260e7541c584e"
 };
-
-
-
 const DOCUMENT_ID = 'flujo-de-caja';
 
-// ── Init ──────────────────────────────────────────────────
-const app      = initializeApp(firebaseConfig);
-const auth     = getAuth(app);
-const db       = getFirestore(app);
-
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
 
 let dataCRC = [], dataUSD = [];
 let draggedItem = null, dragSrcType = '';
 let isSaving = false;
-let currentUser = null;
-let isReadOnly = false;
 
+// ── Sync ──────────────────────────────────────────────────
 async function startSync() {
     await signInAnonymously(auth);
     const docRef = doc(db, 'flujo_caja', DOCUMENT_ID);
     onSnapshot(docRef, (snap) => {
         if (snap.exists() && !isSaving) {
             const d = snap.data();
-            dataCRC = d.dataCRC || [];
-            dataUSD = d.dataUSD || [];
+            dataCRC = (d.dataCRC || []).map(i => ({...i, selected: i.selected || false}));
+            dataUSD = (d.dataUSD || []).map(i => ({...i, selected: i.selected || false}));
             document.getElementById('exchangeRate').value = d.exchangeRate || 512;
             document.getElementById('initCRC').value      = d.initCRC || 0;
             document.getElementById('initUSD').value      = d.initUSD || 0;
@@ -523,18 +340,17 @@ async function startSync() {
                 document.getElementById('lastUpdateDisplay').textContent =
                     'Actualizado: ' + dt.toLocaleTimeString('es-CR', {hour:'2-digit',minute:'2-digit'});
             }
-            renderTables();
+            renderTable();
             setSyncStatus('Sincronizado', '#22c55e');
         } else if (!snap.exists()) {
             saveToCloud();
         }
     }, () => setSyncStatus('Error de conexión', '#ef4444'));
-    setSyncStatus('Sincronizado', '#22c55e');
 }
 
 // ── Save ──────────────────────────────────────────────────
 window.saveToCloud = async () => {
-    if (!auth.currentUser || isReadOnly) return;
+    if (!auth.currentUser) return;
     isSaving = true;
     setSyncStatus('Guardando...', '#f59e0b', true);
     const state = {
@@ -555,39 +371,31 @@ window.saveToCloud = async () => {
     updateCalculations();
 };
 
-
-
-// ── Sync status ───────────────────────────────────────────
 function setSyncStatus(text, color, pulse=false) {
     document.getElementById('syncDot').style.background = color;
     document.getElementById('syncDot').className = `w-1.5 h-1.5 rounded-full ${pulse?'syncing':''}`;
     document.getElementById('syncText').textContent = text;
 }
 
-// ── Share ─────────────────────────────────────────────────
-window.copyShareLink = () => {
-    navigator.clipboard.writeText(window.location.href).then(() => showToast('¡Enlace copiado!'));
-};
-
-// ── Toast ─────────────────────────────────────────────────
+window.copyShareLink = () => navigator.clipboard.writeText(window.location.href).then(() => showToast('¡Enlace copiado!'));
 window.showToast = (msg) => {
     const t = document.getElementById('toast');
     t.textContent = msg; t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 2800);
 };
 
-// ── Import ────────────────────────────────────────────────
+// ── Import ─────────────────────────────────────────────────
 let importType = 'CRC';
-window.openImportModal  = () => { if(isReadOnly){showToast('Inicia sesión para editar');return;} document.getElementById('importModal').style.display='flex'; lucide.createIcons(); };
+window.openImportModal  = () => { document.getElementById('importModal').style.display='flex'; lucide.createIcons(); };
 window.closeImportModal = () => document.getElementById('importModal').style.display='none';
-window.setImportType    = (t) => {
+window.setImportType = (t) => {
     importType = t;
     document.getElementById('importBtnCRC').className = t==='CRC'
-        ? 'flex-1 py-2 rounded-lg text-sm border-2 border-blue-600 text-blue-600 font-bold transition-all bg-blue-50'
-        : 'flex-1 py-2 rounded-lg text-sm border-2 border-gray-200 text-gray-400 font-bold transition-all';
+        ? 'flex-1 py-2 rounded-lg text-sm border-2 border-blue-600 text-blue-600 font-bold bg-blue-50'
+        : 'flex-1 py-2 rounded-lg text-sm border-2 border-gray-200 text-gray-400 font-bold';
     document.getElementById('importBtnUSD').className = t==='USD'
-        ? 'flex-1 py-2 rounded-lg text-sm border-2 border-blue-600 text-blue-600 font-bold transition-all bg-blue-50'
-        : 'flex-1 py-2 rounded-lg text-sm border-2 border-gray-200 text-gray-400 font-bold transition-all';
+        ? 'flex-1 py-2 rounded-lg text-sm border-2 border-blue-600 text-blue-600 font-bold bg-blue-50'
+        : 'flex-1 py-2 rounded-lg text-sm border-2 border-gray-200 text-gray-400 font-bold';
 };
 window.processImport = () => {
     const raw = document.getElementById('importText').value.trim();
@@ -598,38 +406,28 @@ window.processImport = () => {
         const parts = line.split(/[\t,]/).map(p=>p.trim());
         if (parts.length < 2) return;
         let date, concept, amount;
-        // Try to detect if first col is a date
         if (/^\d{4}-\d{2}-\d{2}$/.test(parts[0])) {
             date = parts[0]; concept = parts[1]; amount = parseFloat(parts[2]) || 0;
         } else {
             date = new Date().toISOString().split('T')[0];
             concept = parts[0]; amount = parseFloat(parts[1]) || 0;
         }
-        list.push({ id: Date.now() + Math.random(), date, concept, amount, paid: false });
+        list.push({ id: Date.now() + Math.random(), date, concept, amount, paid: false, selected: false });
         count++;
     });
-    renderTables();
-    saveToCloud();
+    renderTable(); saveToCloud();
     closeImportModal();
     showToast(`${count} movimientos importados ✓`);
 };
 
-// ── Export ────────────────────────────────────────────────
+// ── Export ─────────────────────────────────────────────────
 window.openExportModal  = () => { document.getElementById('exportModal').style.display='flex'; lucide.createIcons(); };
 window.closeExportModal = () => document.getElementById('exportModal').style.display='none';
 
-window.exportJPG = async () => {
-    closeExportModal();
-    showToast('Generando imagen...');
-    // Expand all table wrappers temporarily so nothing clips
-    const tableWraps = document.querySelectorAll('.table-wrap');
-    const origStyles = [];
-    tableWraps.forEach(tw => {
-        origStyles.push(tw.style.cssText);
-        tw.style.overflow = 'visible';
-        tw.style.height = 'auto';
-        tw.style.maxHeight = 'none';
-    });
+async function captureArea() {
+    const tw = document.querySelectorAll('.table-wrap');
+    const orig = [];
+    tw.forEach(el => { orig.push(el.style.cssText); el.style.overflow='visible'; el.style.height='auto'; el.style.maxHeight='none'; });
     await new Promise(r=>setTimeout(r,400));
     const area = document.getElementById('export-area');
     const canvas = await html2canvas(area, {
@@ -637,221 +435,201 @@ window.exportJPG = async () => {
         width: area.scrollWidth, height: area.scrollHeight,
         windowWidth: document.body.scrollWidth,
         scrollX: -window.scrollX, scrollY: -window.scrollY,
-        ignoreElements: el => el.id === 'exportModal' || el.id === 'importModal' || el.id === 'toast'
+        ignoreElements: el => ['exportModal','importModal','toast'].includes(el.id)
     });
-    tableWraps.forEach((tw, i) => tw.style.cssText = origStyles[i]);
-    const link = document.createElement('a');
-    link.download = 'flujo-de-caja.jpg';
-    link.href = canvas.toDataURL('image/jpeg', 0.95);
-    link.click();
+    tw.forEach((el,i) => el.style.cssText = orig[i]);
+    return canvas;
+}
+window.exportJPG = async () => {
+    closeExportModal(); showToast('Generando imagen...');
+    const canvas = await captureArea();
+    const a = document.createElement('a');
+    a.download = 'flujo-de-caja.jpg'; a.href = canvas.toDataURL('image/jpeg', 0.95); a.click();
     showToast('¡Imagen descargada!');
 };
-
 window.exportPDF = async () => {
-    closeExportModal();
-    showToast('Generando PDF...');
-    const tableWraps = document.querySelectorAll('.table-wrap');
-    const origStyles = [];
-    tableWraps.forEach(tw => {
-        origStyles.push(tw.style.cssText);
-        tw.style.overflow = 'visible';
-        tw.style.height = 'auto';
-        tw.style.maxHeight = 'none';
-    });
-    await new Promise(r=>setTimeout(r,400));
-    const area = document.getElementById('export-area');
-    const canvas = await html2canvas(area, {
-        scale: 2, useCORS: true, backgroundColor: '#f0f4f8',
-        width: area.scrollWidth, height: area.scrollHeight,
-        windowWidth: document.body.scrollWidth,
-        scrollX: -window.scrollX, scrollY: -window.scrollY,
-        ignoreElements: el => el.id === 'exportModal' || el.id === 'importModal' || el.id === 'toast'
-    });
-    tableWraps.forEach((tw, i) => tw.style.cssText = origStyles[i]);
+    closeExportModal(); showToast('Generando PDF...');
+    const canvas = await captureArea();
     const { jsPDF } = window.jspdf;
-    const imgW = 210;
-    const imgH = (canvas.height * imgW) / canvas.width;
+    const imgW = 210, imgH = (canvas.height * imgW) / canvas.width;
     const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: imgH > 280 ? [imgW, imgH] : 'a4' });
     pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, imgW, imgH);
     pdf.save('flujo-de-caja.pdf');
     showToast('¡PDF descargado!');
 };
 
-// ── Rows ──────────────────────────────────────────────────
+// ── Rows ───────────────────────────────────────────────────
 window.addRow = (type) => {
-    if (isReadOnly) { showToast('Inicia sesión para editar'); return; }
     const list = type==='CRC' ? dataCRC : dataUSD;
-    list.push({ id: Date.now(), date: new Date().toISOString().split('T')[0], concept: 'Nuevo movimiento', amount: 0, paid: false });
-    renderTables(); saveToCloud();
+    list.push({ id: Date.now(), date: new Date().toISOString().split('T')[0], concept: 'Nuevo movimiento', amount: 0, paid: false, selected: false });
+    renderTable(); saveToCloud();
 };
 window.removeRow = (type, id) => {
-    if (isReadOnly) return;
     if (type==='CRC') dataCRC = dataCRC.filter(i=>i.id!==id);
     else              dataUSD = dataUSD.filter(i=>i.id!==id);
-    renderTables(); saveToCloud();
+    renderTable(); saveToCloud();
 };
 window.updateItem = (type, id, field, value) => {
-    if (isReadOnly) return;
     const list = type==='CRC' ? dataCRC : dataUSD;
     const item = list.find(i=>i.id===id);
-    if (item) {
-        if (field==='amount') item.amount = parseFloat(value)||0;
-        else if (field==='paid') item.paid = value;
-        else item[field] = value;
-    }
-    updateCalculations(); saveToCloud();
+    if (!item) return;
+    if (field==='amount') item.amount = parseFloat(value)||0;
+    else item[field] = value;
+    updateCalculations();
+    // selected state saves to cloud so collaborators see it too
+    saveToCloud();
 };
 
-// ── Drag ──────────────────────────────────────────────────
-window.handleDragStart = (e, type, index) => { if(isReadOnly)return; draggedItem=index; dragSrcType=type; e.currentTarget.classList.add('dragging'); };
+// ── Drag ───────────────────────────────────────────────────
+window.handleDragStart = (e, type, idx) => { draggedItem=idx; dragSrcType=type; e.currentTarget.classList.add('dragging'); };
 window.handleDragEnd   = (e) => { e.currentTarget.classList.remove('dragging'); document.querySelectorAll('tr').forEach(r=>r.classList.remove('drag-over')); };
 window.handleDrop = (e, type, idx) => {
-    e.preventDefault(); if(type!==dragSrcType)return;
+    e.preventDefault(); if(type!==dragSrcType) return;
     const list = type==='CRC' ? dataCRC : dataUSD;
     const item = list.splice(draggedItem,1)[0]; list.splice(idx,0,item);
-    renderTables(); saveToCloud();
+    renderTable(); saveToCloud();
 };
 
-// ── Render ────────────────────────────────────────────────
-function renderTables() {
-    renderBody('CRC', dataCRC, 'tableCRC', '₡');
-    renderBody('USD', dataUSD, 'tableUSD', '$');
+// ── Render ─────────────────────────────────────────────────
+function renderTable() {
+    const tbody = document.getElementById('tableUnified');
+    tbody.innerHTML = '';
+    const exRate  = parseFloat(document.getElementById('exchangeRate').value) || 1;
+    const initCRC = parseFloat(document.getElementById('initCRC').value) || 0;
+    const initUSD = parseFloat(document.getElementById('initUSD').value) || 0;
+
+    // Pre-calculate running balances
+    let balCRC = initCRC, balUSD = initUSD;
+    const bCRC = dataCRC.map(i => { balCRC -= i.amount; return balCRC; });
+    const bUSD = dataUSD.map(i => { balUSD -= i.amount; return balUSD; });
+
+    // Interleave: CRC rows then USD rows (user can drag within each currency)
+    const rows = [
+        ...dataCRC.map((item,idx) => ({...item, _type:'CRC', _idx:idx, _bal:bCRC[idx]})),
+        ...dataUSD.map((item,idx) => ({...item, _type:'USD', _idx:idx, _bal:bUSD[idx]}))
+    ];
+
+    rows.forEach(item => {
+        const isCRC = item._type === 'CRC';
+        const sym = isCRC ? '₡' : '$';
+        const tr = document.createElement('tr');
+        tr.className = `border-b transition-colors ${item.selected ? 'selected-row' : ''}`;
+        tr.draggable = true;
+        tr.ondragstart = e => handleDragStart(e, item._type, item._idx);
+        tr.ondragend   = e => handleDragEnd(e);
+        tr.ondragover  = e => { e.preventDefault(); tr.classList.add('drag-over'); };
+        tr.ondragleave = () => tr.classList.remove('drag-over');
+        tr.ondrop      = e => handleDrop(e, item._type, item._idx);
+
+        tr.innerHTML = `
+            <td class="drag-handle px-2 py-3"><i data-lucide="grip-vertical" class="w-3.5 h-3.5"></i></td>
+            <td class="px-2"><span class="${isCRC?'badge-crc':'badge-usd'}">${isCRC?'CRC':'USD'}</span></td>
+            <td><input type="date" value="${item.date}" onchange="updateItem('${item._type}',${item.id},'date',this.value)" class="cell-input text-xs" style="min-width:108px"></td>
+            <td><input type="text" value="${escHtml(item.concept)}" onchange="updateItem('${item._type}',${item.id},'concept',this.value)" class="cell-input" style="min-width:140px"></td>
+            <td class="text-right">
+                <div class="flex items-center justify-end gap-0.5">
+                    <span class="text-gray-300 text-xs">${sym}</span>
+                    <input type="number" value="${item.amount}" onchange="updateItem('${item._type}',${item.id},'amount',this.value)" class="cell-input amount-input font-semibold">
+                </div>
+            </td>
+            <td class="text-center">
+                <input type="checkbox" ${item.selected?'checked':''} onchange="toggleSelected('${item._type}',${item.id},this.checked,this.closest('tr'))"
+                    class="w-4 h-4 rounded accent-blue-600 cursor-pointer">
+            </td>
+            <td class="text-right text-xs font-bold ${item._bal<0?'bal-neg':'bal-pos'}" style="white-space:nowrap">${fmt(item._bal,sym)}</td>
+            <td class="px-2">
+                <button onclick="removeRow('${item._type}',${item.id})" class="text-gray-300 hover:text-red-500 p-1 rounded transition-colors">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+
     updateCalculations();
     lucide.createIcons();
 }
 
-function renderBody(type, data, elId, sym) {
-    const tbody = document.getElementById(elId);
-    tbody.innerHTML = '';
-    data.forEach((item, index) => {
-        const tr = document.createElement('tr');
-        tr.draggable = !isReadOnly;
-        tr.ondragstart = e => handleDragStart(e, type, index);
-        tr.ondragend   = e => handleDragEnd(e);
-        tr.ondragover  = e => { e.preventDefault(); tr.classList.add('drag-over'); };
-        tr.ondragleave = () => tr.classList.remove('drag-over');
-        tr.ondrop      = e => handleDrop(e, type, index);
+// Toggle selected without full re-render for snappiness
+window.toggleSelected = (type, id, checked, trEl) => {
+    const list = type==='CRC' ? dataCRC : dataUSD;
+    const item = list.find(i=>i.id===id);
+    if (item) { item.selected = checked; }
+    trEl.classList.toggle('selected-row', checked);
+    updateCalculations();
+    saveToCloud();
+};
 
-        tr.innerHTML = `
-            <td class="drag-handle px-1"><i data-lucide="grip-vertical" class="w-3.5 h-3.5"></i></td>
-            <td><input type="date" value="${item.date}" ${isReadOnly?'disabled':''} onchange="updateItem('${type}',${item.id},'date',this.value)" class="cell-input text-xs" style="min-width:105px"></td>
-            <td><input type="text" value="${escHtml(item.concept)}" ${isReadOnly?'disabled':''} onchange="updateItem('${type}',${item.id},'concept',this.value)" class="cell-input text-sm font-500" style="min-width:120px;white-space:nowrap"></td>
-            <td class="text-right">
-                <div class="flex items-center justify-end gap-0.5">
-                    <span class="text-gray-300 text-xs">${sym}</span>
-                    <input type="number" value="${item.amount}" ${isReadOnly?'disabled':''} onchange="updateItem('${type}',${item.id},'amount',this.value)" class="cell-input amount-input text-sm font-600">
-                </div>
-            </td>
-            <td class="text-center">
-                <input type="checkbox" ${item.paid?'checked':''} ${isReadOnly?'disabled':''} onchange="updateItem('${type}',${item.id},'paid',this.checked)"
-                    class="w-4 h-4 rounded accent-blue-600">
-            </td>
-            <td class="text-right balance-cell text-xs">—</td>
-            <td>${!isReadOnly ? `<button class="btn-danger" onclick="removeRow('${type}',${item.id})"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>` : ''}</td>
-        `;
-        tbody.appendChild(tr);
-    });
-}
-
-function escHtml(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
-
-// ── Calculations ──────────────────────────────────────────
+// ── Calculations ───────────────────────────────────────────
 function updateCalculations() {
     const exRate  = parseFloat(document.getElementById('exchangeRate').value) || 1;
     const initCRC = parseFloat(document.getElementById('initCRC').value) || 0;
     const initUSD = parseFloat(document.getElementById('initUSD').value) || 0;
     document.getElementById('tcDisplay').textContent = exRate.toLocaleString('es-CR');
 
-    const pendCRC = dataCRC.reduce((s,i) => !i.paid ? s+i.amount : s, 0);
-    const pendUSD = dataUSD.reduce((s,i) => !i.paid ? s+i.amount : s, 0);
+    // Final available = initial minus ALL movements
+    const finalCRC = dataCRC.reduce((s,i) => s - i.amount, initCRC);
+    const finalUSD = dataUSD.reduce((s,i) => s - i.amount, initUSD);
+    const totalDisp = finalUSD + (finalCRC / exRate);
 
-    let curCRC = initCRC;
-    document.getElementById('tableCRC').querySelectorAll('tr').forEach((row,idx) => {
-        curCRC -= dataCRC[idx]?.amount || 0;
-        const cell = row.querySelector('.balance-cell');
-        if (cell) {
-            cell.textContent = fmt(curCRC, '₡');
-            cell.className = `text-right balance-cell text-xs ${curCRC<0?'bal-neg':'bal-pos'}`;
-        }
-    });
+    setFundVal('dispCRC', finalCRC, '₡');
+    setFundVal('dispUSD', finalUSD, '$');
+    const dtEl = document.getElementById('dispTotal');
+    dtEl.textContent = fmt(totalDisp, '$');
+    dtEl.className = `fund-value global${totalDisp<0?' neg':''}`;
 
-    let curUSD = initUSD;
-    document.getElementById('tableUSD').querySelectorAll('tr').forEach((row,idx) => {
-        curUSD -= dataUSD[idx]?.amount || 0;
-        const cell = row.querySelector('.balance-cell');
-        if (cell) {
-            cell.textContent = fmt(curUSD, '$');
-            cell.className = `text-right balance-cell text-xs ${curUSD<0?'bal-neg':'bal-pos'}`;
-        }
-    });
+    // Selected to pay
+    const selCRC = dataCRC.filter(i=>i.selected);
+    const selUSD = dataUSD.filter(i=>i.selected);
+    const sumCRC = selCRC.reduce((s,i)=>s+i.amount,0);
+    const sumUSD = selUSD.reduce((s,i)=>s+i.amount,0);
+    const sumTotal = sumUSD + (sumCRC / exRate);
+    const totalSel = selCRC.length + selUSD.length;
 
-    document.getElementById('pendingCRC').textContent = fmt(pendCRC,'₡');
-    document.getElementById('pendingUSD').textContent = fmt(pendUSD,'$');
+    setPayVal('paySubCRC', sumCRC, '₡', selCRC.length, 'payCountCRC');
+    setPayVal('paySubUSD', sumUSD, '$', selUSD.length, 'payCountUSD');
+    const ptEl = document.getElementById('payTotal');
+    ptEl.textContent = fmt(sumTotal, '$');
+    ptEl.className = `pay-value${sumTotal===0?' zero':''}`;
+    document.getElementById('payCountTotal').textContent = `${totalSel} movimiento${totalSel!==1?'s':''} seleccionado${totalSel!==1?'s':''}`;
 
-    setFinal('finalCRC', 'labelFinalCRC', curCRC, '₡');
-    setFinal('finalUSD', 'labelFinalUSD', curUSD, '$');
-
-    const total = curUSD + (curCRC / exRate);
-    const el = document.getElementById('totalConsolidated');
-    el.textContent = fmt(total, '$');
-    el.className = `global-amount ${total<0?'negative':''}`;
-    document.getElementById('labelGlobal').textContent =
-        total < 0 ? 'Total dinero necesario (USD)' : 'Saldo total proyectado (USD)';
+    // Global
+    const gEl = document.getElementById('totalConsolidated');
+    gEl.textContent = fmt(totalDisp, '$');
+    gEl.className = `global-amount${totalDisp<0?' negative':''}`;
+    document.getElementById('labelGlobal').textContent = totalDisp<0 ? 'Total dinero necesario (USD)' : 'Saldo total proyectado (USD)';
 }
 
 function fmt(val, sym) {
-    return (val<0?'-':'')+sym+Math.abs(val).toLocaleString('es-CR',{minimumFractionDigits:2});
+    return (val<0?'-':'')+sym+Math.abs(val).toLocaleString('es-CR',{minimumFractionDigits:2,maximumFractionDigits:2});
 }
-function setFinal(id, labelId, val, sym) {
-    const el  = document.getElementById(id);
-    const lab = document.getElementById(labelId);
+function setFundVal(id, val, sym) {
+    const el = document.getElementById(id);
     el.textContent = fmt(val, sym);
-    el.style.color = val < 0 ? '#ef4444' : '#1d4ed8';
-    lab.textContent = val < 0 ? 'Dinero necesario' : 'Saldo restante';
+    el.className = `fund-value${val<0?' neg':' pos'}`;
 }
+function setPayVal(id, val, sym, count, countId) {
+    const el = document.getElementById(id);
+    el.textContent = fmt(val, sym);
+    el.className = `pay-value${val===0?' zero':''}`;
+    document.getElementById(countId).textContent = `${count} movimiento${count!==1?'s':''}`;
+}
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
 
-// ── Boot ──────────────────────────────────────────────────
 window.onload = () => { startSync(); lucide.createIcons(); };
 </script>
 
 <script>
-// Register service worker
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js').catch(()=>{});
-}
-
-// PWA install — Chrome on Android shows native prompt
+if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js').catch(()=>{}); }
 let deferredPrompt;
-window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    const btn = document.getElementById('installBtn');
-    if (btn) { btn.style.display = 'flex'; }
-});
-window.addEventListener('appinstalled', () => {
-    const btn = document.getElementById('installBtn');
-    if (btn) btn.style.display = 'none';
-    deferredPrompt = null;
-});
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt=e; document.getElementById('installBtn').style.display='flex'; });
+window.addEventListener('appinstalled', () => { document.getElementById('installBtn').style.display='none'; deferredPrompt=null; });
+window.addEventListener('load', () => { if (!window.matchMedia('(display-mode: standalone)').matches) document.getElementById('installBtn').style.display='flex'; });
 window.installPWA = async () => {
-    if (!deferredPrompt) {
-        // Fallback: show instructions
-        alert('Para instalar:\n\niOS Safari: Compartir → Agregar a inicio\nAndroid Chrome: Menú (⋮) → Agregar a pantalla de inicio');
-        return;
-    }
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    deferredPrompt = null;
-    const btn = document.getElementById('installBtn');
-    if (btn) btn.style.display = 'none';
+    if (!deferredPrompt) { alert('iOS Safari: Compartir → Agregar a inicio\nAndroid Chrome: Menú (⋮) → Agregar a pantalla de inicio'); return; }
+    deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt=null;
+    document.getElementById('installBtn').style.display='none';
 };
-// Show install button always so users know it exists
-window.addEventListener('load', () => {
-    const btn = document.getElementById('installBtn');
-    if (btn && !window.matchMedia('(display-mode: standalone)').matches) {
-        btn.style.display = 'flex';
-    }
-});
 </script>
 </body>
 </html>
