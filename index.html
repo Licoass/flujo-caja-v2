@@ -198,22 +198,26 @@
     <div class="card">
         <div class="funds-grid">
             <div class="fund-box">
-                <div class="fund-label">Fondo inicial ₡</div>
-                <div class="flex items-center gap-1 mb-3">
-                    <span class="text-gray-300 font-bold">₡</span>
-                    <input type="number" id="initCRC" value="0" class="cell-input text-lg font-bold text-gray-800 w-40" onchange="saveToCloud()">
-                </div>
                 <div class="fund-label">Disponible en colones</div>
-                <div class="fund-value pos" id="dispCRC">₡0.00</div>
+                <div class="flex items-center gap-2 mb-1">
+                    <div class="fund-value pos" id="dispCRC">₡0.00</div>
+                </div>
+                <div class="flex items-center gap-1 mt-2">
+                    <span class="text-gray-300 text-xs font-bold">Fondo:</span>
+                    <span class="text-gray-300 text-xs font-bold">₡</span>
+                    <input type="number" id="initCRC" value="0" class="cell-input text-xs text-gray-400 w-32" onchange="saveToCloud()">
+                </div>
             </div>
             <div class="fund-box">
-                <div class="fund-label">Fondo inicial $</div>
-                <div class="flex items-center gap-1 mb-3">
-                    <span class="text-gray-300 font-bold">$</span>
-                    <input type="number" id="initUSD" value="0" class="cell-input text-lg font-bold text-gray-800 w-36" onchange="saveToCloud()">
-                </div>
                 <div class="fund-label">Disponible en dólares</div>
-                <div class="fund-value pos" id="dispUSD">$0.00</div>
+                <div class="flex items-center gap-2 mb-1">
+                    <div class="fund-value pos" id="dispUSD">$0.00</div>
+                </div>
+                <div class="flex items-center gap-1 mt-2">
+                    <span class="text-gray-300 text-xs font-bold">Fondo:</span>
+                    <span class="text-gray-300 text-xs font-bold">$</span>
+                    <input type="number" id="initUSD" value="0" class="cell-input text-xs text-gray-400 w-28" onchange="saveToCloud()">
+                </div>
             </div>
             <div class="fund-box" style="background:#f8fafc">
                 <div class="fund-label">Total disponible general (USD)</div>
@@ -248,6 +252,7 @@
                         <th>Fecha</th>
                         <th>Concepto</th>
                         <th class="text-right">Monto</th>
+                        <th class="text-right hide-mobile" style="color:#94a3b8">Equiv. USD</th>
                         <th class="text-center">A pagar</th>
                         <th class="text-right">Saldo</th>
                         <th class="w-8"></th>
@@ -524,9 +529,20 @@ function renderTable() {
         tr.ondragleave = () => tr.classList.remove('drag-over');
         tr.ondrop      = e => handleDrop(e, item._type, item._idx);
 
+        const equivCell = isCRC
+            ? `<td class="text-right hide-mobile" style="white-space:nowrap;color:#94a3b8;font-size:11px">≈ ${fmt(item.amount/exRate,'$')}</td>`
+            : `<td class="hide-mobile"></td>`;
+
         tr.innerHTML = `
             <td class="drag-handle px-2 py-3"><i data-lucide="grip-vertical" class="w-3.5 h-3.5"></i></td>
-            <td class="px-2"><span class="${isCRC?'badge-crc':'badge-usd'}">${isCRC?'CRC':'USD'}</span></td>
+            <td class="px-2">
+                <select onchange="changeType('${item._type}',${item.id},this.value)"
+                    class="text-xs font-bold border-none outline-none cursor-pointer rounded-full px-2 py-1 ${isCRC?'bg-green-100 text-green-800':'bg-blue-100 text-blue-800'}"
+                    style="appearance:none;-webkit-appearance:none;">
+                    <option value="CRC" ${isCRC?'selected':''}>CRC</option>
+                    <option value="USD" ${!isCRC?'selected':''}>USD</option>
+                </select>
+            </td>
             <td><input type="date" value="${item.date}" onchange="updateItem('${item._type}',${item.id},'date',this.value)" class="cell-input text-xs" style="min-width:108px"></td>
             <td><input type="text" value="${escHtml(item.concept)}" onchange="updateItem('${item._type}',${item.id},'concept',this.value)" class="cell-input" style="min-width:140px"></td>
             <td class="text-right">
@@ -535,6 +551,7 @@ function renderTable() {
                     <input type="number" value="${item.amount}" onchange="updateItem('${item._type}',${item.id},'amount',this.value)" class="cell-input amount-input font-semibold">
                 </div>
             </td>
+            ${equivCell}
             <td class="text-center">
                 <input type="checkbox" ${item.selected?'checked':''} onchange="toggleSelected('${item._type}',${item.id},this.checked,this.closest('tr'))"
                     class="w-4 h-4 rounded accent-blue-600 cursor-pointer">
@@ -552,6 +569,20 @@ function renderTable() {
     updateCalculations();
     lucide.createIcons();
 }
+
+// Change currency type of an existing row
+window.changeType = (currentType, id, newType) => {
+    if (currentType === newType) return;
+    // Find item in current list
+    const srcList = currentType==='CRC' ? dataCRC : dataUSD;
+    const dstList = newType==='CRC' ? dataCRC : dataUSD;
+    const idx = srcList.findIndex(i=>i.id===id);
+    if (idx === -1) return;
+    const item = srcList.splice(idx, 1)[0];
+    dstList.push(item);
+    renderTable();
+    saveToCloud();
+};
 
 // Toggle selected without full re-render for snappiness
 window.toggleSelected = (type, id, checked, trEl) => {
