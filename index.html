@@ -499,8 +499,6 @@ function renderTable() {
     const initUSD = parseFloat(document.getElementById('initUSD').value) || 0;
 
     // Single running balance in USD for all rows
-    const initCRC = parseFloat(document.getElementById('initCRC').value) || 0;
-    const initUSD = parseFloat(document.getElementById('initUSD').value) || 0;
     let runningUSD = initUSD + (initCRC / exRate);
 
     // Build combined list: CRC first then USD, calculating running USD balance
