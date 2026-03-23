@@ -498,16 +498,21 @@ function renderTable() {
     const initCRC = parseFloat(document.getElementById('initCRC').value) || 0;
     const initUSD = parseFloat(document.getElementById('initUSD').value) || 0;
 
-    // Pre-calculate running balances
-    let balCRC = initCRC, balUSD = initUSD;
-    const bCRC = dataCRC.map(i => { balCRC -= i.amount; return balCRC; });
-    const bUSD = dataUSD.map(i => { balUSD -= i.amount; return balUSD; });
+    // Single running balance in USD for all rows
+    const initCRC = parseFloat(document.getElementById('initCRC').value) || 0;
+    const initUSD = parseFloat(document.getElementById('initUSD').value) || 0;
+    let runningUSD = initUSD + (initCRC / exRate);
 
-    // Interleave: CRC rows then USD rows (user can drag within each currency)
-    const rows = [
-        ...dataCRC.map((item,idx) => ({...item, _type:'CRC', _idx:idx, _bal:bCRC[idx]})),
-        ...dataUSD.map((item,idx) => ({...item, _type:'USD', _idx:idx, _bal:bUSD[idx]}))
-    ];
+    // Build combined list: CRC first then USD, calculating running USD balance
+    const crcRows = dataCRC.map((item, idx) => {
+        runningUSD -= (item.amount / exRate);
+        return {...item, _type:'CRC', _idx:idx, _bal:runningUSD};
+    });
+    const usdRows = dataUSD.map((item, idx) => {
+        runningUSD -= item.amount;
+        return {...item, _type:'USD', _idx:idx, _bal:runningUSD};
+    });
+    const rows = [...crcRows, ...usdRows];
 
     rows.forEach(item => {
         const isCRC = item._type === 'CRC';
@@ -536,7 +541,7 @@ function renderTable() {
                 <input type="checkbox" ${item.selected?'checked':''} onchange="toggleSelected('${item._type}',${item.id},this.checked,this.closest('tr'))"
                     class="w-4 h-4 rounded accent-blue-600 cursor-pointer">
             </td>
-            <td class="text-right text-xs font-bold ${item._bal<0?'bal-neg':'bal-pos'}" style="white-space:nowrap">${fmt(item._bal,sym)}</td>
+            <td class="text-right text-xs font-bold ${item._bal<0?'bal-neg':'bal-pos'}" style="white-space:nowrap">${fmt(item._bal,'$')}</td>
             <td class="px-2">
                 <button onclick="removeRow('${item._type}',${item.id})" class="text-gray-300 hover:text-red-500 p-1 rounded transition-colors">
                     <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
@@ -567,16 +572,20 @@ function updateCalculations() {
     const initUSD = parseFloat(document.getElementById('initUSD').value) || 0;
     document.getElementById('tcDisplay').textContent = exRate.toLocaleString('es-CR');
 
-    // Final available = initial minus ALL movements
+    // Disponible = solo los fondos iniciales, sin restar nada
+    const totalDisp = initUSD + (initCRC / exRate);
+
+    // Saldo proyectado = fondo menos todos los movimientos
     const finalCRC = dataCRC.reduce((s,i) => s - i.amount, initCRC);
     const finalUSD = dataUSD.reduce((s,i) => s - i.amount, initUSD);
-    const totalDisp = finalUSD + (finalCRC / exRate);
 
-    setFundVal('dispCRC', finalCRC, '₡');
-    setFundVal('dispUSD', finalUSD, '$');
+    setFundVal('dispCRC', initCRC, '₡');
+    setFundVal('dispUSD', initUSD, '$');
     const dtEl = document.getElementById('dispTotal');
     dtEl.textContent = fmt(totalDisp, '$');
     dtEl.className = `fund-value global${totalDisp<0?' neg':''}`;
+
+    // Use finalCRC/finalUSD for global balance at bottom
 
     // Selected to pay
     const selCRC = dataCRC.filter(i=>i.selected);
@@ -593,11 +602,12 @@ function updateCalculations() {
     ptEl.className = `pay-value${sumTotal===0?' zero':''}`;
     document.getElementById('payCountTotal').textContent = `${totalSel} movimiento${totalSel!==1?'s':''} seleccionado${totalSel!==1?'s':''}`;
 
-    // Global
+    // Global = fondo inicial menos todos los movimientos
+    const globalUSD = finalUSD + (finalCRC / exRate);
     const gEl = document.getElementById('totalConsolidated');
-    gEl.textContent = fmt(totalDisp, '$');
-    gEl.className = `global-amount${totalDisp<0?' negative':''}`;
-    document.getElementById('labelGlobal').textContent = totalDisp<0 ? 'Total dinero necesario (USD)' : 'Saldo total proyectado (USD)';
+    gEl.textContent = fmt(globalUSD, '$');
+    gEl.className = `global-amount${globalUSD<0?' negative':''}`;
+    document.getElementById('labelGlobal').textContent = globalUSD<0 ? 'Total dinero necesario (USD)' : 'Saldo total proyectado (USD)';
 }
 
 function fmt(val, sym) {
