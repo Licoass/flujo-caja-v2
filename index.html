@@ -3,97 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-    <title>Flujo de Caja v2</title>
+    <title>Flujo de Caja - Eco Ingeniería</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#1a3a6c">
+    <meta name="theme-color" content="#2167AF">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Flujo Caja">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Flujo Eco">
     <link rel="apple-touch-icon" href="icon-192.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            blue: '#2167AF',
+                            green: '#6BB54E',
+                            cyan: '#1E97D1',
+                            dark: '#1e293b',
+                            bg: '#f0f4f9'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         * { font-family: 'Plus Jakarta Sans', sans-serif; }
-        :root {
-            --blue-950: #0a1628; --blue-800: #1a3a6c;
-            --blue-700: #1e4d9c; --blue-600: #2563eb; --blue-400: #60a5fa;
-        }
-        body { background: #f0f4f8; min-height: 100vh; }
+        h1, h2, h3, .brand-font { font-family: 'Montserrat', sans-serif; }
+        body { background: #f0f4f9; min-height: 100vh; color: #1f1f1f; }
 
-        .app-header { background: linear-gradient(135deg, var(--blue-950) 0%, var(--blue-800) 100%); border-bottom: 1px solid rgba(255,255,255,0.08); }
-        .version-badge { background: rgba(255,255,255,0.12); color: #bfdbfe; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; letter-spacing: 0.08em; text-transform: uppercase; }
-        .btn-primary { background: var(--blue-600); color: #fff; font-weight: 600; font-size: 13px; padding: 8px 16px; border-radius: 8px; display: flex; align-items: center; gap: 6px; transition: background 0.15s; white-space: nowrap; }
-        .btn-primary:hover { background: var(--blue-700); }
-        .btn-ghost { background: rgba(255,255,255,0.1); color: #fff; font-weight: 600; font-size: 13px; padding: 8px 16px; border-radius: 8px; display: flex; align-items: center; gap: 6px; transition: background 0.15s; white-space: nowrap; }
-        .btn-ghost:hover { background: rgba(255,255,255,0.18); }
-        .card { background: #fff; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.06); overflow: hidden; }
-        .card-header-blue { background: linear-gradient(135deg, var(--blue-800) 0%, var(--blue-700) 100%); padding: 14px 20px; }
-        .rate-box { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.18); border-radius: 10px; padding: 8px 14px; }
+        .app-header { background: #ffffff; border-bottom: 1px solid #e2e8f0; }
+        .version-badge { background: #f0f4f9; color: #2167AF; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 20px; border: 1px solid #e2e8f0; text-transform: uppercase; }
+        .btn-primary { background: #2167AF; color: #fff; font-weight: 600; font-size: 13px; padding: 8px 16px; border-radius: 8px; display: flex; align-items: center; gap: 6px; transition: all 0.15s; white-space: nowrap; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .btn-primary:hover { background: #1b5692; }
+        .btn-ghost { background: transparent; color: #4b5563; font-weight: 600; font-size: 13px; padding: 8px 16px; border-radius: 8px; display: flex; align-items: center; gap: 6px; border: 1px solid #e5e7eb; transition: all 0.15s; white-space: nowrap; }
+        .btn-ghost:hover { background: #f3f4f6; color: #111827; }
+        
+        .card { background: #ffffff; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.02), 0 4px 12px rgba(0,0,0,0.03); border: 1px solid #e2e8f0; overflow: hidden; }
+        .card-header-blue { background: #ffffff; border-bottom: 1px solid #e2e8f0; padding: 14px 20px; }
+        .card-header-green { background: #ffffff; border-bottom: 1px solid #e2e8f0; padding: 14px 20px; }
+        .rate-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 6px 12px; }
 
-        /* Table */
+        /* Table styles */
         .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
         table { width: 100%; border-collapse: collapse; table-layout: auto; }
-        thead th { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #64748b; padding: 10px 12px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
+        thead th { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #5f6368; padding: 12px 14px; background: #f8f9fa; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
         tbody tr { border-bottom: 1px solid #f1f5f9; transition: background 0.1s; }
-        tbody tr:hover { background: #f0f7ff; }
-        tbody tr.selected-row { background: #eff6ff !important; }
-        tbody td { padding: 8px 12px; }
+        tbody tr:hover { background: #f8fafd; }
+        tbody tr.selected-row { background: #e8f0fe !important; }
+        tbody tr.selected-card-row { background: #e6f4ea !important; }
+        tbody td { padding: 10px 14px; }
         .drag-handle { color: #cbd5e1; cursor: grab; }
-        tbody tr:hover .drag-handle { color: var(--blue-400); }
+        tbody tr:hover .drag-handle { color: #2167AF; }
         .dragging { opacity: 0.4; }
-        .drag-over { border-top: 2px solid var(--blue-600) !important; }
+        .drag-over { border-top: 2px solid #2167AF !important; }
 
-        .cell-input { background: transparent; border: none; outline: none; width: 100%; font-family: inherit; font-size: 13px; color: #1e293b; }
-        .cell-input:focus { background: #eff6ff; border-radius: 6px; padding: 2px 6px; }
-        .amount-input { text-align: right; width: 100px; }
+        .cell-input { background: transparent; border: none; outline: none; width: 100%; font-family: inherit; font-size: 13px; color: #202124; }
+        .cell-input:focus { background: #f1f3f4; border-radius: 4px; padding: 2px 6px; }
+        .amount-input { text-align: right; width: 110px; }
 
-        .badge-crc { background: #dcfce7; color: #15803d; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 20px; white-space: nowrap; display: inline-block; }
-        .badge-usd { background: #dbeafe; color: #1d4ed8; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 20px; white-space: nowrap; display: inline-block; }
+        .badge-crc { background: #e6f4ea; color: #137333; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 20px; white-space: nowrap; display: inline-block; }
+        .badge-usd { background: #e8f0fe; color: #1a73e8; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 20px; white-space: nowrap; display: inline-block; }
 
-        .bal-pos { color: #2563eb; font-weight: 700; }
+        .bal-pos { color: #2167AF; font-weight: 700; }
         .bal-neg { color: #ef4444; font-weight: 700; }
 
         /* Funds panel */
-        .funds-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; }
+        .funds-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
+        @media (max-width: 1024px) { .funds-grid { grid-template-columns: 1fr 1fr; } }
         @media (max-width: 640px) { .funds-grid { grid-template-columns: 1fr; } }
-        .fund-box { padding: 18px 22px; border-right: 1px solid #f1f5f9; }
+        .fund-box { padding: 18px 22px; border-right: 1px solid #e2e8f0; }
         .fund-box:last-child { border-right: none; }
-        .fund-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; margin-bottom: 4px; }
-        .fund-value { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
-        .fund-value.pos { color: #1d4ed8; }
+        .fund-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #5f6368; margin-bottom: 4px; }
+        .fund-value { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+        .fund-value.pos { color: #2167AF; }
         .fund-value.neg { color: #ef4444; }
-        .fund-value.global { font-size: 28px; color: #0f172a; }
+        .fund-value.global { font-size: 24px; color: #202124; }
         .fund-value.global.neg { color: #ef4444; }
 
-        /* Payment panel */
-        .pay-panel { background: linear-gradient(135deg, #0f2340 0%, #1a3a6c 100%); border-radius: 16px; padding: 22px 24px; box-shadow: 0 8px 24px rgba(10,22,40,0.2); }
-        .pay-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
-        @media (max-width: 640px) { .pay-grid { grid-template-columns: 1fr; gap: 10px; } }
-        .pay-box { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 14px 18px; }
-        .pay-box.highlight { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.25); }
-        .pay-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.45); margin-bottom: 4px; }
-        .pay-value { font-size: 22px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
-        .pay-value.zero { color: rgba(255,255,255,0.28); }
-        .pay-count { font-size: 11px; color: rgba(255,255,255,0.38); margin-top: 3px; }
+        /* Resumen Egresos */
+        .pay-panel { background: #ffffff; border-radius: 16px; padding: 22px 24px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+        .pay-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+        @media (max-width: 768px) { .pay-grid { grid-template-columns: 1fr; gap: 10px; } }
+        .pay-box { background: #f8f9fa; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 18px; }
+        .pay-box.highlight { background: #e8f0fe; border-color: #d2e3fc; }
+        .pay-box.highlight-green { background: #e6f4ea; border-color: #ceead6; }
+        .pay-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #5f6368; margin-bottom: 4px; }
+        .pay-value { font-size: 22px; font-weight: 800; color: #202124; letter-spacing: -0.5px; }
+        .pay-value.zero { color: #bcc1c6; }
+        .pay-value.highlight-val { color: #1a73e8; }
+        .pay-value.highlight-green-val { color: #137333; }
+        .pay-count { font-size: 11px; color: #5f6368; margin-top: 3px; }
 
-        /* Global */
-        .global-card { background: linear-gradient(135deg, var(--blue-950) 0%, var(--blue-800) 100%); border-radius: 20px; padding: 28px 32px; text-align: center; box-shadow: 0 8px 32px rgba(10,22,40,0.25); }
-        .global-amount { font-size: clamp(32px, 7vw, 52px); font-weight: 800; color: #fff; letter-spacing: -2px; line-height: 1; }
-        .global-amount.negative { color: #fca5a5; }
-        .global-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(255,255,255,0.45); margin-bottom: 6px; }
+        /* Dashboard Global */
+        .global-card { background: #ffffff; border-radius: 20px; border: 1px solid #e2e8f0; padding: 24px 32px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        .global-amount { font-size: clamp(28px, 6vw, 44px); font-weight: 800; color: #2167AF; letter-spacing: -1.5px; line-height: 1.1; }
+        .global-amount.negative { color: #d93025; }
+        .global-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: #5f6368; margin-bottom: 6px; }
 
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
         .syncing { animation: pulse 1.2s infinite; }
 
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 16px; backdrop-filter: blur(4px); }
-        .modal-box { background: #fff; border-radius: 16px; padding: 28px; max-width: 480px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 16px; backdrop-filter: blur(2px); }
+        .modal-box { background: #fff; border-radius: 16px; padding: 28px; max-width: 480px; width: 100%; box-shadow: 0 12px 36px rgba(0,0,0,0.15); border: 1px solid #e2e8f0; }
 
-        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #1e293b; color: #fff; padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; z-index: 2000; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
+        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #202124; color: #fff; padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; z-index: 2000; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
         .toast.show { opacity: 1; }
+
+        .nav-tab-btn { position: relative; color: #5f6368; font-weight: 700; }
+        .nav-tab-btn.active { color: #2167AF; }
+        .nav-tab-btn.active::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 3px; background-color: #2167AF; border-radius: 3px 3px 0 0; }
 
         @media (max-width: 640px) { .hide-mobile { display: none !important; } thead th, tbody td { padding: 6px 8px; } }
         @media (min-width: 1024px) { thead th { padding: 12px 14px; } tbody td { padding: 10px 14px; } }
@@ -111,15 +136,15 @@
             <button onclick="closeImportModal()" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
         </div>
         <p class="text-sm text-gray-500 mb-3">Formato por línea: <code class="bg-gray-100 px-1 rounded text-xs">fecha, concepto, monto</code></p>
-        <code class="block text-xs bg-gray-50 rounded-lg p-3 mb-4 text-gray-600">2025-01-15, Alquiler, 500000<br>2025-01-20, Servicios, 75000</code>
+        <code class="block text-xs bg-gray-50 rounded-lg p-3 mb-4 text-gray-600">2025-01-15, Alquiler, 500,000.00<br>15/01/2025, Servicios, 75000</code>
         <div class="flex gap-2 mb-3">
-            <button onclick="setImportType('CRC')" id="importBtnCRC" class="flex-1 py-2 rounded-lg text-sm border-2 border-blue-600 text-blue-600 font-bold bg-blue-50">₡ Colones</button>
+            <button onclick="setImportType('CRC')" id="importBtnCRC" class="flex-1 py-2 rounded-lg text-sm border-2 border-brand-blue text-brand-blue font-bold bg-blue-50">₡ Colones</button>
             <button onclick="setImportType('USD')" id="importBtnUSD" class="flex-1 py-2 rounded-lg text-sm border-2 border-gray-200 text-gray-400 font-bold">$ Dólares</button>
         </div>
-        <textarea id="importText" rows="6" placeholder="Pega tus datos aquí..." class="w-full border border-gray-200 rounded-lg p-3 text-sm font-mono focus:outline-none focus:border-blue-400 resize-none"></textarea>
+        <textarea id="importText" rows="6" placeholder="Pega tus datos desde Excel o archivo de texto aquí..." class="w-full border border-gray-200 rounded-lg p-3 text-sm font-mono focus:outline-none focus:border-brand-blue resize-none"></textarea>
         <div class="flex gap-2 mt-4">
             <button onclick="closeImportModal()" class="flex-1 py-2 rounded-lg border border-gray-200 text-sm text-gray-500 hover:bg-gray-50">Cancelar</button>
-            <button onclick="processImport()" class="flex-1 py-2 rounded-lg bg-blue-600 text-white text-sm font-bold hover:bg-blue-700">Importar</button>
+            <button onclick="processImport()" class="flex-1 py-2 rounded-lg bg-brand-blue text-white text-sm font-bold hover:bg-blue-700">Importar</button>
         </div>
     </div>
 </div>
@@ -132,15 +157,15 @@
             <button onclick="closeExportModal()" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
         </div>
         <div class="grid grid-cols-2 gap-3">
-            <button onclick="exportPDF()" class="flex flex-col items-center gap-3 p-6 rounded-xl border-2 border-gray-100 hover:border-blue-400 hover:bg-blue-50 transition-all group">
+            <button onclick="exportPDF()" class="flex flex-col items-center gap-3 p-6 rounded-xl border-2 border-gray-100 hover:border-brand-blue hover:bg-blue-50 transition-all group">
                 <div class="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center group-hover:bg-red-100">
                     <i data-lucide="file-text" class="w-6 h-6 text-red-500"></i>
                 </div>
                 <div class="text-center"><div class="font-bold text-gray-800 text-sm">PDF</div><div class="text-xs text-gray-400 mt-1">Para imprimir</div></div>
             </button>
-            <button onclick="exportJPG()" class="flex flex-col items-center gap-3 p-6 rounded-xl border-2 border-gray-100 hover:border-blue-400 hover:bg-blue-50 transition-all group">
+            <button onclick="exportJPG()" class="flex flex-col items-center gap-3 p-6 rounded-xl border-2 border-gray-100 hover:border-brand-blue hover:bg-blue-50 transition-all group">
                 <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center group-hover:bg-blue-100">
-                    <i data-lucide="image" class="w-6 h-6 text-blue-500"></i>
+                    <i data-lucide="image" class="w-6 h-6 text-brand-blue"></i>
                 </div>
                 <div class="text-center"><div class="font-bold text-gray-800 text-sm">JPG</div><div class="text-xs text-gray-400 mt-1">Para compartir</div></div>
             </button>
@@ -149,18 +174,16 @@
 </div>
 
 <!-- ═══ HEADER ═══ -->
-<div class="app-header px-4 py-4 sticky top-0 z-50">
+<div class="app-header px-4 py-3 sticky top-0 z-50 shadow-sm">
     <div class="max-w-[1600px] mx-auto flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-3">
-            <div style="background:rgba(255,255,255,0.12);border-radius:10px;padding:8px;">
-                <i data-lucide="bar-chart-2" class="w-5 h-5 text-white"></i>
-            </div>
-            <div>
+            <img src="logo-aire-acondicionado-eco-ingenieria-energia-solar.png" alt="Eco Ingeniería" class="h-10 object-contain">
+            <div class="border-l border-gray-200 pl-3">
                 <div class="flex items-center gap-2">
-                    <h1 class="text-base" style="color:#fff;font-weight:800;">Flujo de Caja</h1>
+                    <h1 class="text-sm sm:text-base font-black tracking-wide text-gray-800 uppercase brand-font">Flujo de Caja</h1>
                     <span class="version-badge">v2</span>
                 </div>
-                <div id="syncStatus" class="flex items-center gap-1.5 text-xs" style="color:rgba(255,255,255,0.5)">
+                <div id="syncStatus" class="flex items-center gap-1.5 text-xs text-gray-500">
                     <span id="syncDot" class="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
                     <span id="syncText">Conectando...</span>
                 </div>
@@ -168,10 +191,10 @@
         </div>
         <div class="flex items-center gap-2 flex-wrap">
             <div class="rate-box flex items-center gap-2">
-                <span style="color:rgba(255,255,255,0.5);font-size:11px;font-weight:700;">T.C.</span>
-                <span style="color:rgba(255,255,255,0.6);font-size:12px;">₡</span>
+                <span class="text-gray-500 text-[10px] font-bold uppercase tracking-wider">T.C.</span>
+                <span class="text-gray-600 text-xs">₡</span>
                 <input type="number" id="exchangeRate" value="512.00" step="0.01"
-                    style="background:transparent;border:none;color:#fff;font-weight:700;font-size:14px;width:64px;outline:none;"
+                    class="bg-transparent border-none text-gray-800 font-bold text-sm w-16 outline-none"
                     onchange="saveToCloud()">
             </div>
             <button onclick="openImportModal()" class="btn-ghost text-xs">
@@ -190,110 +213,319 @@
     </div>
 </div>
 
-<!-- ═══ CONTENIDO ═══ -->
-<div id="export-area">
-<div class="max-w-[1600px] mx-auto px-4 py-5 space-y-5">
+<!-- ═══ NAVIGATION TABS ═══ -->
+<div class="max-w-[1600px] mx-auto px-4 mt-6">
+    <div class="flex border-b border-gray-200">
+        <button id="tabBtnEgresos" onclick="switchTab('egresos')" class="nav-tab-btn active px-5 py-3 text-xs sm:text-sm font-bold transition-all flex items-center gap-2">
+            <i data-lucide="arrow-down-right" class="w-4 h-4"></i> Egresos (Bancos)
+        </button>
+        <button id="tabBtnCobrar" onclick="switchTab('cobrar')" class="nav-tab-btn px-5 py-3 text-xs sm:text-sm font-bold transition-all flex items-center gap-2">
+            <i data-lucide="arrow-up-left" class="w-4 h-4"></i> Cuentas por Cobrar
+        </button>
+        <button id="tabBtnTarjetas" onclick="switchTab('tarjetas')" class="nav-tab-btn px-5 py-3 text-xs sm:text-sm font-bold transition-all flex items-center gap-2">
+            <i data-lucide="credit-card" class="w-4 h-4"></i> Tarjetas de Crédito
+        </button>
+    </div>
+</div>
 
-    <!-- Panel de fondos disponibles -->
+<!-- ═══ GLOBAL CONTENT CONTAINER (EXPORT AREA) ═══ -->
+<div id="export-area">
+<div class="max-w-[1600px] mx-auto px-4 py-5 space-y-6">
+
+    <!-- Panel de fondos disponibles (Siempre Visible) -->
     <div class="card">
         <div class="funds-grid">
             <div class="fund-box">
-                <div class="fund-label">Disponible en colones</div>
-                <div class="flex items-center gap-2 mb-1">
-                    <div class="fund-value pos" id="dispCRC">₡0.00</div>
-                </div>
-                <div class="flex items-center gap-1 mt-2">
-                    <span class="text-gray-300 text-xs font-bold">Fondo:</span>
-                    <span class="text-gray-300 text-xs font-bold">₡</span>
-                    <input type="number" id="initCRC" value="0" class="cell-input text-xs text-gray-400 w-32" onchange="saveToCloud()">
+                <div class="fund-label">Disponible Bancos Colones</div>
+                <div class="fund-value pos" id="dispCRC">₡0.00</div>
+                <div class="flex items-center gap-1 mt-3">
+                    <span class="text-gray-400 text-[10px] font-bold uppercase">Fondo: ₡</span>
+                    <input type="number" id="initCRC" value="0" class="cell-input text-xs text-gray-500 w-24 border border-gray-100 rounded px-1" onchange="saveToCloud()">
                 </div>
             </div>
             <div class="fund-box">
-                <div class="fund-label">Disponible en dólares</div>
-                <div class="flex items-center gap-2 mb-1">
-                    <div class="fund-value pos" id="dispUSD">$0.00</div>
+                <div class="fund-label">Disponible Bancos Dólares</div>
+                <div class="fund-value pos" id="dispUSD">$0.00</div>
+                <div class="flex items-center gap-1 mt-3">
+                    <span class="text-gray-400 text-[10px] font-bold uppercase">Fondo: $</span>
+                    <input type="number" id="initUSD" value="0" class="cell-input text-xs text-gray-500 w-24 border border-gray-100 rounded px-1" onchange="saveToCloud()">
                 </div>
-                <div class="flex items-center gap-1 mt-2">
-                    <span class="text-gray-300 text-xs font-bold">Fondo:</span>
-                    <span class="text-gray-300 text-xs font-bold">$</span>
-                    <input type="number" id="initUSD" value="0" class="cell-input text-xs text-gray-400 w-28" onchange="saveToCloud()">
+            </div>
+            <div class="fund-box">
+                <div class="fund-label">Caja Chica</div>
+                <div class="fund-value pos" id="dispCajaChica">₡0.00</div>
+                <div class="flex items-center gap-1.5 mt-3">
+                    <span class="text-gray-400 text-[10px] font-bold uppercase">Fondo:</span>
+                    <input type="number" id="initCajaChica" value="0" class="cell-input text-xs text-gray-500 w-16 border border-gray-100 rounded px-1" onchange="saveToCloud()">
+                    <select id="cajaChicaCurrency" onchange="saveToCloud()" class="text-[10px] border border-gray-200 rounded px-0.5 py-0.5 text-gray-500 font-bold bg-white outline-none cursor-pointer">
+                        <option value="CRC">₡ CRC</option>
+                        <option value="USD">$ USD</option>
+                    </select>
                 </div>
             </div>
             <div class="fund-box" style="background:#f8fafc">
-                <div class="fund-label">Total disponible general (USD)</div>
+                <div class="fund-label">Total Disponible General (USD)</div>
                 <div class="fund-value global" id="dispTotal">$0.00</div>
-                <div class="text-xs text-gray-400 mt-2">Ambos fondos convertidos a USD</div>
+                <div class="text-xs text-gray-400 mt-3">Bancos + Caja Chica en USD</div>
             </div>
         </div>
     </div>
 
-    <!-- Tabla unificada -->
-    <div class="card">
-        <div class="card-header-blue flex justify-between items-center gap-3">
-            <div class="flex items-center gap-2">
-                <i data-lucide="list" class="w-4 h-4 text-white opacity-80"></i>
-                <span class="text-white font-bold text-sm tracking-wide">MOVIMIENTOS</span>
+
+    <!-- ═══ SECCIÓN TAB EGRESOS ═══ -->
+    <div id="tabContentEgresos" class="space-y-6">
+        <!-- Tabla unificada de egresos -->
+        <div class="card">
+            <div class="card-header-blue flex justify-between items-center gap-3">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="list" class="w-4 h-4 text-brand-blue opacity-80"></i>
+                    <span class="text-gray-800 font-bold text-sm tracking-wide uppercase">Movimientos de Egreso (Cuentas por Pagar)</span>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="addRow('CRC')" class="flex items-center gap-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold px-3 py-1.5 rounded-lg border border-gray-200 transition-all">
+                        <i data-lucide="plus" class="w-3.5 h-3.5 text-brand-blue"></i> ₡ Colones
+                    </button>
+                    <button onclick="addRow('USD')" class="flex items-center gap-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold px-3 py-1.5 rounded-lg border border-gray-200 transition-all">
+                        <i data-lucide="plus" class="w-3.5 h-3.5 text-brand-blue"></i> $ Dólares
+                    </button>
+                </div>
             </div>
-            <div class="flex gap-2">
-                <button onclick="addRow('CRC')" class="flex items-center gap-1 bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-all">
-                    <i data-lucide="plus" class="w-3.5 h-3.5"></i> ₡ Colones
-                </button>
-                <button onclick="addRow('USD')" class="flex items-center gap-1 bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-all">
-                    <i data-lucide="plus" class="w-3.5 h-3.5"></i> $ Dólares
-                </button>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="w-6"></th>
+                            <th>Moneda</th>
+                            <th>Fecha</th>
+                            <th>Concepto</th>
+                            <th class="text-right">Monto</th>
+                            <th class="text-right hide-mobile" style="color:#94a3b8">Equiv. Moneda</th>
+                            <th class="text-center">A pagar (Banco)</th>
+                            <th class="text-center">P. Tarjeta</th>
+                            <th class="text-right">Saldo Bancos</th>
+                            <th class="w-8"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableUnified"></tbody>
+                </table>
             </div>
         </div>
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr>
-                        <th class="w-6"></th>
-                        <th>Moneda</th>
-                        <th>Fecha</th>
-                        <th>Concepto</th>
-                        <th class="text-right">Monto</th>
-                        <th class="text-right hide-mobile" style="color:#94a3b8">Equiv. USD</th>
-                        <th class="text-center">A pagar</th>
-                        <th class="text-right">Saldo</th>
-                        <th class="w-8"></th>
-                    </tr>
-                </thead>
-                <tbody id="tableUnified"></tbody>
-            </table>
+
+        <!-- Panel selección a pagar -->
+        <div class="pay-panel">
+            <div class="text-xs font-bold uppercase tracking-widest mb-4 text-gray-500">
+                Resumen de Egresos Proyectados
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Pagos Bancos -->
+                <div class="border-b lg:border-b-0 lg:border-r border-gray-200 pb-4 lg:pb-0 lg:pr-6">
+                    <div class="text-xs font-bold text-brand-blue mb-2 uppercase tracking-wide">Seleccionados para Pago Bancario</div>
+                    <div class="pay-grid">
+                        <div class="pay-box">
+                            <div class="pay-label">Subtotal Colones</div>
+                            <div class="pay-value zero" id="paySubCRC">₡0.00</div>
+                            <div class="pay-count" id="payCountCRC">0 movs</div>
+                        </div>
+                        <div class="pay-box">
+                            <div class="pay-label">Subtotal Dólares</div>
+                            <div class="pay-value zero" id="paySubUSD">$0.00</div>
+                            <div class="pay-count" id="payCountUSD">0 movs</div>
+                        </div>
+                        <div class="pay-box highlight">
+                            <div class="pay-label">Total Bancos (USD)</div>
+                            <div class="pay-value zero highlight-val" id="payTotal">$0.00</div>
+                            <div class="pay-count" id="payCountTotal">0 movs</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Pagos Tarjeta -->
+                <div>
+                    <div class="text-xs font-bold text-brand-green mb-2 uppercase tracking-wide">Pagos Programados con Tarjeta</div>
+                    <div class="pay-grid">
+                        <div class="pay-box">
+                            <div class="pay-label">Subtotal Colones</div>
+                            <div class="pay-value zero" id="cardPaySubCRC">₡0.00</div>
+                            <div class="pay-count" id="cardPayCountCRC">0 movs</div>
+                        </div>
+                        <div class="pay-box">
+                            <div class="pay-label">Subtotal Dólares</div>
+                            <div class="pay-value zero" id="cardPaySubUSD">$0.00</div>
+                            <div class="pay-count" id="cardPayCountUSD">0 movs</div>
+                        </div>
+                        <div class="pay-box highlight-green">
+                            <div class="pay-label">Total Tarjetas (USD)</div>
+                            <div class="pay-value zero highlight-green-val" id="cardPayTotal">$0.00</div>
+                            <div class="pay-count" id="cardPayCountTotal">0 movs</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Panel selección a pagar -->
-    <div class="pay-panel">
-        <div class="text-xs font-bold uppercase tracking-widest mb-4" style="color:rgba(255,255,255,0.4)">
-            Resumen — movimientos seleccionados a pagar
+
+    <!-- ═══ SECCIÓN TAB CUENTAS POR COBRAR ═══ -->
+    <div id="tabContentCobrar" class="space-y-6" style="display:none">
+        <div class="card">
+            <div class="card-header-green flex justify-between items-center gap-3">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="trending-up" class="w-4 h-4 text-brand-green opacity-80"></i>
+                    <span class="text-gray-800 font-bold text-sm tracking-wide uppercase">Cuentas por Cobrar (Ingresos Proyectados)</span>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="addReceivableRow('CRC')" class="flex items-center gap-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold px-3 py-1.5 rounded-lg border border-gray-200 transition-all">
+                        <i data-lucide="plus" class="w-3.5 h-3.5 text-brand-green"></i> ₡ Colones
+                    </button>
+                    <button onclick="addReceivableRow('USD')" class="flex items-center gap-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold px-3 py-1.5 rounded-lg border border-gray-200 transition-all">
+                        <i data-lucide="plus" class="w-3.5 h-3.5 text-brand-green"></i> $ Dólares
+                    </button>
+                </div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="w-6"></th>
+                            <th>Moneda</th>
+                            <th>Fecha Registro</th>
+                            <th>Cliente</th>
+                            <th class="text-right">Monto</th>
+                            <th class="text-right hide-mobile" style="color:#94a3b8">Equiv. Moneda</th>
+                            <th>F. Pago Tentativa</th>
+                            <th>Observaciones</th>
+                            <th class="text-center">A Recibir</th>
+                            <th class="w-8"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableReceivables"></tbody>
+                </table>
+            </div>
         </div>
-        <div class="pay-grid">
-            <div class="pay-box">
-                <div class="pay-label">Subtotal en colones</div>
-                <div class="pay-value zero" id="paySubCRC">₡0.00</div>
-                <div class="pay-count" id="payCountCRC">0 movimientos</div>
+
+        <!-- Resumen de Cobros -->
+        <div class="pay-panel">
+            <div class="text-xs font-bold uppercase tracking-widest mb-4 text-gray-500">
+                Resumen de Ingresos Seleccionados a Recibir
             </div>
-            <div class="pay-box">
-                <div class="pay-label">Subtotal en dólares</div>
-                <div class="pay-value zero" id="paySubUSD">$0.00</div>
-                <div class="pay-count" id="payCountUSD">0 movimientos</div>
-            </div>
-            <div class="pay-box highlight">
-                <div class="pay-label">Total a pagar (USD)</div>
-                <div class="pay-value zero" id="payTotal">$0.00</div>
-                <div class="pay-count" id="payCountTotal">0 movimientos seleccionados</div>
+            <div class="pay-grid">
+                <div class="pay-box">
+                    <div class="pay-label">Subtotal Colones</div>
+                    <div class="pay-value zero" id="recSubCRC">₡0.00</div>
+                    <div class="pay-count" id="recCountCRC">0 cuentas</div>
+                </div>
+                <div class="pay-box">
+                    <div class="pay-label">Subtotal Dólares</div>
+                    <div class="pay-value zero" id="recSubUSD">$0.00</div>
+                    <div class="pay-count" id="recCountUSD">0 cuentas</div>
+                </div>
+                <div class="pay-box highlight-green">
+                    <div class="pay-label">Total a Recibir (USD)</div>
+                    <div class="pay-value zero highlight-green-val" id="recTotal">$0.00</div>
+                    <div class="pay-count" id="recCountTotal">0 cuentas seleccionadas</div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Balance global total -->
+
+    <!-- ═══ SECCIÓN TAB TARJETAS DE CRÉDITO ═══ -->
+    <div id="tabContentTarjetas" class="space-y-6" style="display:none">
+        <!-- Resumen de Disponibles Tarjetas -->
+        <div class="card bg-slate-900 border-slate-800 text-white p-6 shadow-md relative overflow-hidden">
+            <div class="absolute -right-16 -top-16 w-44 h-44 bg-white/5 rounded-full pointer-events-none"></div>
+            <div class="flex flex-wrap items-center justify-between gap-4 relative z-10">
+                <div>
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest">Resumen Consolidado de Tarjetas</h3>
+                    <div class="text-3xl font-black mt-1 text-emerald-400" id="totalCardAvailable">$0.00</div>
+                    <div class="text-[10px] text-gray-400 uppercase tracking-wider mt-1">Disponible Real Proyectado (USD)</div>
+                </div>
+                <div class="flex flex-wrap gap-6 text-sm">
+                    <div class="border-l border-gray-700 pl-4">
+                        <span class="block text-xs text-gray-400 font-medium">Límite Total</span>
+                        <span class="font-bold text-gray-200" id="totalCardLimit">$0.00</span>
+                    </div>
+                    <div class="border-l border-gray-700 pl-4">
+                        <span class="block text-xs text-gray-400 font-medium">Cargos Programados</span>
+                        <span class="font-bold text-red-400" id="totalCardCharges">$0.00</span>
+                    </div>
+                    <div class="border-l border-gray-700 pl-4">
+                        <span class="block text-xs text-gray-400 font-medium">Disponible Inicial</span>
+                        <span class="font-bold text-gray-200" id="totalCardInitAvailable">$0.00</span>
+                    </div>
+                </div>
+                <div>
+                    <button onclick="addCard()" class="flex items-center gap-1 bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-4 py-2 rounded-lg border border-white/10 transition-all">
+                        <i data-lucide="plus" class="w-4 h-4 text-emerald-400"></i> Agregar Tarjeta
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Secciones agrupadas de tarjetas de crédito -->
+        <div class="space-y-6">
+            <!-- 1. Tarjetas de la Empresa -->
+            <div>
+                <div class="flex items-center gap-2 mb-3 px-1">
+                    <i data-lucide="building-2" class="w-4 h-4 text-brand-blue"></i>
+                    <h4 class="text-xs font-extrabold uppercase tracking-wider text-gray-600">Tarjetas de la Empresa</h4>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="companyCardsGrid"></div>
+            </div>
+            
+            <!-- 2. Personales de Luis -->
+            <div>
+                <div class="flex items-center gap-2 mb-3 px-1">
+                    <i data-lucide="user" class="w-4 h-4 text-brand-blue"></i>
+                    <h4 class="text-xs font-extrabold uppercase tracking-wider text-gray-600">Personales de Luis</h4>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="luisCardsGrid"></div>
+            </div>
+
+            <!-- 3. Personales de Khay -->
+            <div>
+                <div class="flex items-center gap-2 mb-3 px-1">
+                    <i data-lucide="user" class="w-4 h-4 text-brand-green"></i>
+                    <h4 class="text-xs font-extrabold uppercase tracking-wider text-gray-600">Personales de Khay</h4>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="khayCardsGrid"></div>
+            </div>
+
+            <!-- 4. Nuevas Asignaciones -->
+            <div id="newCardsSection" style="display:none">
+                <div class="flex items-center gap-2 mb-3 px-1">
+                    <i data-lucide="plus-circle" class="w-4 h-4 text-brand-cyan"></i>
+                    <h4 class="text-xs font-extrabold uppercase tracking-wider text-gray-600">Nuevas Asignaciones</h4>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="newCardsGrid"></div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ═══ DASHBOARD PROYECCIÓN GLOBAL consolidado ═══ -->
     <div class="global-card">
-        <div class="global-label" id="labelGlobal">Saldo total proyectado (USD)</div>
-        <div class="global-amount" id="totalConsolidated">$0.00</div>
-        <div class="mt-3 flex justify-center gap-6 text-xs" style="color:rgba(255,255,255,0.35)">
-            <span>T.C.: ₡<span id="tcDisplay">512.00</span></span>
-            <span id="lastUpdateDisplay"></span>
+        <div class="global-label">Panel Proyectado de Liquidez Final (USD)</div>
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 text-gray-800 text-center py-4 my-2 border-y border-gray-150">
+            <div class="p-2">
+                <span class="block text-[10px] text-gray-500 uppercase font-bold tracking-wide">Bancos Proyectado</span>
+                <span class="text-xl font-extrabold text-brand-blue" id="dashBancos">$0.00</span>
+            </div>
+            <div class="p-2">
+                <span class="block text-[10px] text-gray-500 uppercase font-bold tracking-wide">Caja Chica</span>
+                <span class="text-xl font-extrabold text-gray-700" id="dashCajaChica">$0.00</span>
+            </div>
+            <div class="p-2">
+                <span class="block text-[10px] text-gray-500 uppercase font-bold tracking-wide">Ingresos por Recibir</span>
+                <span class="text-xl font-extrabold text-brand-green" id="dashIngresos">+$0.00</span>
+            </div>
+            <div class="p-2 bg-gray-50 rounded-xl border border-gray-200 shadow-sm">
+                <span class="block text-[10px] text-gray-600 uppercase font-extrabold tracking-wider">Liquidez Estimada Final</span>
+                <span class="text-2xl font-black text-brand-green" id="dashTotal">$0.00</span>
+            </div>
+        </div>
+        <div class="mt-3 flex flex-wrap justify-between items-center gap-2 text-xs" style="color:#5f6368">
+            <span id="lastUpdateDisplay">Actualizado: --:--</span>
+            <span>T.C. de Conversión: ₡<span id="tcDisplay">512.00</span></span>
         </div>
     </div>
 
@@ -301,7 +533,7 @@
 </div>
 
 <div class="max-w-[1600px] mx-auto px-4 pb-8">
-    <p class="text-center text-xs text-gray-400">Flujo de Caja v2 · Sync en tiempo real · <a href="#" onclick="copyShareLink()" class="text-blue-400 hover:underline">Compartir</a></p>
+    <p class="text-center text-xs text-gray-500">Flujo de Caja Eco Ingeniería · Sincronización colaborativa en tiempo real</p>
 </div>
 
 <!-- ═══ FIREBASE + LÓGICA ═══ -->
@@ -324,9 +556,56 @@ const app  = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getFirestore(app);
 
+// Data local
 let dataCRC = [], dataUSD = [];
+let receivablesCRC = [], receivablesUSD = [];
+let creditCards = [];
+let activeTab = 'egresos';
+
 let draggedItem = null, dragSrcType = '';
 let isSaving = false;
+
+// Listas de ID fijas para agrupación
+const companyIds = ['ae_luis', 'ae_khay', 'mc_luis', 'mc_khay', 'visa_luis', 'visa_khay', 'pyme'];
+const luisIds = ['walmart_luis', 'pricemart_luis', 'connet_millas'];
+const khayIds = ['walmart_khay', 'pricemaart_khay', 'cashback'];
+
+// Tarjetas inicializadas a partir del PDF de disponibles cargado por el usuario
+const defaultCards = [
+    // Empresa
+    { id: 'ae_luis', name: 'AE Luis', limit: 2000.00, available: 95.90 },
+    { id: 'ae_khay', name: 'AE Khay', limit: 2000.00, available: 500.00 },
+    { id: 'mc_luis', name: 'MC Luis', limit: 2000.00, available: 218.14 },
+    { id: 'mc_khay', name: 'MC Khay', limit: 2000.00, available: 500.00 },
+    { id: 'visa_luis', name: 'Visa Luis', limit: 5000.00, available: 1510.94 },
+    { id: 'visa_khay', name: 'Visa Khay', limit: 5000.00, available: 720.14 },
+    { id: 'pyme', name: 'Pyme', limit: 5000.00, available: 801.00 },
+    // Personal de Luis
+    { id: 'walmart_luis', name: 'Walmart 09/07 (Luis)', limit: 5000.00, available: 4012.96 },
+    { id: 'pricemart_luis', name: 'Pricemart Luis', limit: 5000.00, available: -3804.61 },
+    { id: 'connet_millas', name: 'Connet y Millas', limit: 2000.00, available: 200.00 },
+    // Personal de Khay
+    { id: 'walmart_khay', name: 'Walmart Khay', limit: 2000.00, available: 266.05 },
+    { id: 'pricemaart_khay', name: 'Pricemaart Khay', limit: 2000.00, available: -574.94 },
+    { id: 'cashback', name: 'Cashback', limit: 1000.00, available: 99.42 }
+];
+
+// ── Navegación de Tabs ────────────────────────────────────
+window.switchTab = (tabName) => {
+    activeTab = tabName;
+    
+    document.querySelectorAll('.nav-tab-btn').forEach(btn => btn.classList.remove('active'));
+    
+    document.getElementById('tabContentEgresos').style.display = tabName === 'egresos' ? 'block' : 'none';
+    document.getElementById('tabContentCobrar').style.display = tabName === 'cobrar' ? 'block' : 'none';
+    document.getElementById('tabContentTarjetas').style.display = tabName === 'tarjetas' ? 'block' : 'none';
+    
+    if (tabName === 'egresos') document.getElementById('tabBtnEgresos').classList.add('active');
+    if (tabName === 'cobrar') document.getElementById('tabBtnCobrar').classList.add('active');
+    if (tabName === 'tarjetas') document.getElementById('tabBtnTarjetas').classList.add('active');
+    
+    lucide.createIcons();
+};
 
 // ── Sync ──────────────────────────────────────────────────
 async function startSync() {
@@ -335,19 +614,39 @@ async function startSync() {
     onSnapshot(docRef, (snap) => {
         if (snap.exists() && !isSaving) {
             const d = snap.data();
-            dataCRC = (d.dataCRC || []).map(i => ({...i, selected: i.selected || false}));
-            dataUSD = (d.dataUSD || []).map(i => ({...i, selected: i.selected || false}));
+            dataCRC = (d.dataCRC || []).map(i => ({
+                ...i, 
+                selected: i.selected || false,
+                selected_card: i.selected_card || false,
+                card_id: i.card_id || 'ae_luis'
+            }));
+            dataUSD = (d.dataUSD || []).map(i => ({
+                ...i, 
+                selected: i.selected || false,
+                selected_card: i.selected_card || false,
+                card_id: i.card_id || 'ae_luis'
+            }));
+            receivablesCRC = (d.receivablesCRC || []).map(i => ({...i, selected: i.selected || false}));
+            receivablesUSD = (d.receivablesUSD || []).map(i => ({...i, selected: i.selected || false}));
+            creditCards = d.creditCards !== undefined ? d.creditCards : defaultCards;
+            
             document.getElementById('exchangeRate').value = d.exchangeRate || 512;
             document.getElementById('initCRC').value      = d.initCRC || 0;
             document.getElementById('initUSD').value      = d.initUSD || 0;
+            document.getElementById('initCajaChica').value = d.initCajaChica || 0;
+            document.getElementById('cajaChicaCurrency').value = d.cajaChicaCurrency || 'CRC';
+            
             if (d.lastUpdate) {
                 const dt = new Date(d.lastUpdate);
                 document.getElementById('lastUpdateDisplay').textContent =
                     'Actualizado: ' + dt.toLocaleTimeString('es-CR', {hour:'2-digit',minute:'2-digit'});
             }
             renderTable();
-            setSyncStatus('Sincronizado', '#22c55e');
+            renderReceivablesTable();
+            renderCards();
+            setSyncStatus('Sincronizado', '#6BB54E');
         } else if (!snap.exists()) {
+            creditCards = defaultCards;
             saveToCloud();
         }
     }, () => setSyncStatus('Error de conexión', '#ef4444'));
@@ -360,15 +659,19 @@ window.saveToCloud = async () => {
     setSyncStatus('Guardando...', '#f59e0b', true);
     const state = {
         dataCRC, dataUSD,
+        receivablesCRC, receivablesUSD,
+        creditCards,
         exchangeRate: parseFloat(document.getElementById('exchangeRate').value) || 512,
         initCRC:      parseFloat(document.getElementById('initCRC').value) || 0,
         initUSD:      parseFloat(document.getElementById('initUSD').value) || 0,
+        initCajaChica: parseFloat(document.getElementById('initCajaChica').value) || 0,
+        cajaChicaCurrency: document.getElementById('cajaChicaCurrency').value || 'CRC',
         lastUpdate:   new Date().toISOString()
     };
     try {
         await setDoc(doc(db, 'flujo_caja', DOCUMENT_ID), state);
         setTimeout(() => { isSaving = false; }, 800);
-        setSyncStatus('Sincronizado', '#22c55e');
+        setSyncStatus('Sincronizado', '#6BB54E');
     } catch(e) {
         setSyncStatus('Error al guardar', '#ef4444');
         isSaving = false;
@@ -389,6 +692,65 @@ window.showToast = (msg) => {
     setTimeout(() => t.classList.remove('show'), 2800);
 };
 
+// ── Helper CSV/Parse (Importación Corregida) ───────────────
+function parseCSVLine(text, separator) {
+    let insideQuote = false;
+    let entries = [];
+    let entry = '';
+    for (let i = 0; i < text.length; i++) {
+        let char = text[i];
+        if (char === '"') {
+            insideQuote = !insideQuote;
+        } else if (char === separator && !insideQuote) {
+            entries.push(entry.trim());
+            entry = '';
+        } else {
+            entry += char;
+        }
+    }
+    entries.push(entry.trim());
+    return entries;
+}
+
+function parseAmount(str) {
+    if (!str) return 0;
+    let clean = str.replace(/[¢$₡\s"']/g, '');
+    if (clean.includes(',') && clean.includes('.')) {
+        if (clean.indexOf(',') < clean.indexOf('.')) {
+            clean = clean.replace(/,/g, '');
+        } else {
+            clean = clean.replace(/\./g, '').replace(/,/g, '.');
+        }
+    } else if (clean.includes(',')) {
+        const parts = clean.split(',');
+        if (parts[parts.length - 1].length === 3) {
+            clean = clean.replace(/,/g, '');
+        } else {
+            clean = clean.replace(/,/g, '.');
+        }
+    } else if (clean.includes('.')) {
+        const parts = clean.split('.');
+        if (parts[parts.length - 1].length === 3 && parts.length > 1) {
+            clean = clean.replace(/\./g, '');
+        }
+    }
+    return parseFloat(clean) || 0;
+}
+
+function parseDate(str) {
+    if (!str) return '';
+    str = str.trim();
+    let match = str.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/);
+    if (match) {
+        return `${match[1]}-${match[2].padStart(2, '0')}-${match[3].padStart(2, '0')}`;
+    }
+    match = str.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/);
+    if (match) {
+        return `${match[3]}-${match[2].padStart(2, '0')}-${match[1].padStart(2, '0')}`;
+    }
+    return '';
+}
+
 // ── Import ─────────────────────────────────────────────────
 let importType = 'CRC';
 window.openImportModal  = () => { document.getElementById('importModal').style.display='flex'; lucide.createIcons(); };
@@ -396,31 +758,69 @@ window.closeImportModal = () => document.getElementById('importModal').style.dis
 window.setImportType = (t) => {
     importType = t;
     document.getElementById('importBtnCRC').className = t==='CRC'
-        ? 'flex-1 py-2 rounded-lg text-sm border-2 border-blue-600 text-blue-600 font-bold bg-blue-50'
+        ? 'flex-1 py-2 rounded-lg text-sm border-2 border-brand-blue text-brand-blue font-bold bg-blue-50'
         : 'flex-1 py-2 rounded-lg text-sm border-2 border-gray-200 text-gray-400 font-bold';
     document.getElementById('importBtnUSD').className = t==='USD'
-        ? 'flex-1 py-2 rounded-lg text-sm border-2 border-blue-600 text-blue-600 font-bold bg-blue-50'
+        ? 'flex-1 py-2 rounded-lg text-sm border-2 border-brand-blue text-brand-blue font-bold bg-blue-50'
         : 'flex-1 py-2 rounded-lg text-sm border-2 border-gray-200 text-gray-400 font-bold';
 };
 window.processImport = () => {
     const raw = document.getElementById('importText').value.trim();
     if (!raw) return showToast('Pega datos primero');
-    const list = importType === 'CRC' ? dataCRC : dataUSD;
+    
+    const isEgresos = activeTab === 'egresos';
+    const list = isEgresos 
+        ? (importType === 'CRC' ? dataCRC : dataUSD)
+        : (importType === 'CRC' ? receivablesCRC : receivablesUSD);
+        
     let count = 0;
     raw.split('\n').forEach(line => {
-        const parts = line.split(/[\t,]/).map(p=>p.trim());
-        if (parts.length < 2) return;
-        let date, concept, amount;
-        if (/^\d{4}-\d{2}-\d{2}$/.test(parts[0])) {
-            date = parts[0]; concept = parts[1]; amount = parseFloat(parts[2]) || 0;
+        line = line.trim();
+        if (!line) return;
+        
+        let parts = [];
+        if (line.includes('\t')) {
+            parts = line.split('\t').map(p=>p.trim());
         } else {
-            date = new Date().toISOString().split('T')[0];
-            concept = parts[0]; amount = parseFloat(parts[1]) || 0;
+            parts = parseCSVLine(line, ',').map(p=>p.trim());
         }
-        list.push({ id: Date.now() + Math.random(), date, concept, amount, paid: false, selected: false });
+        
+        if (parts.length < 2) return;
+        
+        let date = '';
+        let concept = '';
+        let amount = 0;
+        
+        let parsedDate = parseDate(parts[0]);
+        if (parsedDate) {
+            date = parsedDate;
+            concept = parts[1] || '';
+            amount = parseAmount(parts[2]);
+        } else {
+            let parsedDate2 = parseDate(parts[1]);
+            if (parsedDate2) {
+                date = parsedDate2;
+                concept = parts[0] || '';
+                amount = parseAmount(parts[2]);
+            } else {
+                date = new Date().toISOString().split('T')[0];
+                concept = parts[0] || '';
+                amount = parseAmount(parts[parts.length - 1]);
+            }
+        }
+        
+        if (isEgresos) {
+            list.push({ id: Date.now() + Math.random(), date, concept, amount, paid: false, selected: false, selected_card: false, card_id: 'ae_luis' });
+        } else {
+            list.push({ id: Date.now() + Math.random(), date, client: concept, amount, tentativeDate: date, observations: '', selected: false });
+        }
         count++;
     });
-    renderTable(); saveToCloud();
+    
+    if (isEgresos) renderTable();
+    else renderReceivablesTable();
+    
+    saveToCloud();
     closeImportModal();
     showToast(`${count} movimientos importados ✓`);
 };
@@ -436,7 +836,7 @@ async function captureArea() {
     await new Promise(r=>setTimeout(r,400));
     const area = document.getElementById('export-area');
     const canvas = await html2canvas(area, {
-        scale: 2, useCORS: true, backgroundColor: '#f0f4f8',
+        scale: 2, useCORS: true, backgroundColor: '#f0f4f9',
         width: area.scrollWidth, height: area.scrollHeight,
         windowWidth: document.body.scrollWidth,
         scrollX: -window.scrollX, scrollY: -window.scrollY,
@@ -449,7 +849,7 @@ window.exportJPG = async () => {
     closeExportModal(); showToast('Generando imagen...');
     const canvas = await captureArea();
     const a = document.createElement('a');
-    a.download = 'flujo-de-caja.jpg'; a.href = canvas.toDataURL('image/jpeg', 0.95); a.click();
+    a.download = `flujo-caja-${activeTab}.jpg`; a.href = canvas.toDataURL('image/jpeg', 0.95); a.click();
     showToast('¡Imagen descargada!');
 };
 window.exportPDF = async () => {
@@ -459,14 +859,14 @@ window.exportPDF = async () => {
     const imgW = 210, imgH = (canvas.height * imgW) / canvas.width;
     const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: imgH > 280 ? [imgW, imgH] : 'a4' });
     pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, imgW, imgH);
-    pdf.save('flujo-de-caja.pdf');
+    pdf.save(`flujo-caja-${activeTab}.pdf`);
     showToast('¡PDF descargado!');
 };
 
-// ── Rows ───────────────────────────────────────────────────
+// ── Rows (Egresos) ─────────────────────────────────────────
 window.addRow = (type) => {
     const list = type==='CRC' ? dataCRC : dataUSD;
-    list.push({ id: Date.now(), date: new Date().toISOString().split('T')[0], concept: 'Nuevo movimiento', amount: 0, paid: false, selected: false });
+    list.push({ id: Date.now(), date: new Date().toISOString().split('T')[0], concept: 'Nuevo movimiento', amount: 0, paid: false, selected: false, selected_card: false, card_id: 'ae_luis' });
     renderTable(); saveToCloud();
 };
 window.removeRow = (type, id) => {
@@ -480,22 +880,151 @@ window.updateItem = (type, id, field, value) => {
     if (!item) return;
     if (field==='amount') item.amount = parseFloat(value)||0;
     else item[field] = value;
+    renderTable();
+    saveToCloud();
+};
+window.changeType = (currentType, id, newType) => {
+    if (currentType === newType) return;
+    const srcList = currentType==='CRC' ? dataCRC : dataUSD;
+    const dstList = newType==='CRC' ? dataCRC : dataUSD;
+    const idx = srcList.findIndex(i=>i.id===id);
+    if (idx === -1) return;
+    const item = srcList.splice(idx, 1)[0];
+    dstList.push(item);
+    renderTable();
+    saveToCloud();
+};
+window.toggleSelected = (type, id, checked, trEl) => {
+    const list = type==='CRC' ? dataCRC : dataUSD;
+    const item = list.find(i=>i.id===id);
+    if (item) { item.selected = checked; }
+    trEl.classList.toggle('selected-row', checked);
     updateCalculations();
-    // selected state saves to cloud so collaborators see it too
+    saveToCloud();
+};
+window.toggleSelectedCard = (type, id, checked, trEl) => {
+    const list = type==='CRC' ? dataCRC : dataUSD;
+    const item = list.find(i=>i.id===id);
+    if (item) { 
+        item.selected_card = checked; 
+        if (checked && !item.card_id) {
+            item.card_id = creditCards.length > 0 ? creditCards[0].id : 'ae_luis';
+        }
+    }
+    renderTable();
+    saveToCloud();
+};
+window.updateItemCard = (type, id, cardId) => {
+    const list = type==='CRC' ? dataCRC : dataUSD;
+    const item = list.find(i=>i.id===id);
+    if (item) { item.card_id = cardId; }
+    updateCalculations();
+    renderCards();
     saveToCloud();
 };
 
-// ── Drag ───────────────────────────────────────────────────
+// ── Rows (Cuentas por Cobrar) ────────────────────────────────
+window.addReceivableRow = (type) => {
+    const list = type==='CRC' ? receivablesCRC : receivablesUSD;
+    list.push({ 
+        id: Date.now(), 
+        date: new Date().toISOString().split('T')[0], 
+        client: 'Nuevo Cliente', 
+        amount: 0, 
+        tentativeDate: new Date().toISOString().split('T')[0], 
+        observations: '', 
+        selected: false 
+    });
+    renderReceivablesTable(); saveToCloud();
+};
+window.removeReceivableRow = (type, id) => {
+    if (type==='CRC') receivablesCRC = receivablesCRC.filter(i=>i.id!==id);
+    else              receivablesUSD = receivablesUSD.filter(i=>i.id!==id);
+    renderReceivablesTable(); saveToCloud();
+};
+window.updateReceivableItem = (type, id, field, value) => {
+    const list = type==='CRC' ? receivablesCRC : receivablesUSD;
+    const item = list.find(i=>i.id===id);
+    if (!item) return;
+    if (field==='amount') item.amount = parseFloat(value)||0;
+    else item[field] = value;
+    renderReceivablesTable();
+    saveToCloud();
+};
+window.changeReceivableType = (currentType, id, newType) => {
+    if (currentType === newType) return;
+    const srcList = currentType==='CRC' ? receivablesCRC : receivablesUSD;
+    const dstList = newType==='CRC' ? receivablesCRC : receivablesUSD;
+    const idx = srcList.findIndex(i=>i.id===id);
+    if (idx === -1) return;
+    const item = srcList.splice(idx, 1)[0];
+    dstList.push(item);
+    renderReceivablesTable();
+    saveToCloud();
+};
+window.toggleReceivableSelected = (type, id, checked, trEl) => {
+    const list = type==='CRC' ? receivablesCRC : receivablesUSD;
+    const item = list.find(i=>i.id===id);
+    if (item) { item.selected = checked; }
+    trEl.classList.toggle('selected-row', checked);
+    updateCalculations();
+    saveToCloud();
+};
+
+// ── Cards (Edición y Control de Tarjetas) ─────────────────────
+window.updateCard = (idx, field, value) => {
+    if (field === 'available' || field === 'limit') {
+        creditCards[idx][field] = parseFloat(value) || 0;
+    } else {
+        creditCards[idx][field] = value;
+    }
+    renderCards();
+    updateCalculations();
+    saveToCloud();
+};
+window.addCard = () => {
+    const newId = 'card_' + Date.now();
+    creditCards.push({
+        id: newId,
+        name: 'Nueva Tarjeta',
+        limit: 1000.00,
+        available: 1000.00
+    });
+    renderCards();
+    renderTable(); // Para incluir la tarjeta en los selectores
+    saveToCloud();
+    showToast('Nueva tarjeta añadida');
+};
+window.removeCard = (idx) => {
+    if (confirm(`¿Está seguro de que desea eliminar la tarjeta "${creditCards[idx].name}"?`)) {
+        creditCards.splice(idx, 1);
+        renderCards();
+        renderTable(); // Re-render para quitar la tarjeta de los dropdowns
+        saveToCloud();
+        showToast('Tarjeta eliminada');
+    }
+};
+
+// ── Drag & Drop ───────────────────────────────────────────
 window.handleDragStart = (e, type, idx) => { draggedItem=idx; dragSrcType=type; e.currentTarget.classList.add('dragging'); };
 window.handleDragEnd   = (e) => { e.currentTarget.classList.remove('dragging'); document.querySelectorAll('tr').forEach(r=>r.classList.remove('drag-over')); };
 window.handleDrop = (e, type, idx) => {
-    e.preventDefault(); if(type!==dragSrcType) return;
-    const list = type==='CRC' ? dataCRC : dataUSD;
-    const item = list.splice(draggedItem,1)[0]; list.splice(idx,0,item);
-    renderTable(); saveToCloud();
+    e.preventDefault(); 
+    if(type!==dragSrcType) return;
+    const isEgresos = activeTab === 'egresos';
+    const list = isEgresos 
+        ? (type==='CRC' ? dataCRC : dataUSD)
+        : (type==='CRC' ? receivablesCRC : receivablesUSD);
+        
+    const item = list.splice(draggedItem,1)[0]; 
+    list.splice(idx,0,item);
+    
+    if (isEgresos) renderTable();
+    else renderReceivablesTable();
+    saveToCloud();
 };
 
-// ── Render ─────────────────────────────────────────────────
+// ── Render Tables ──────────────────────────────────────────
 function renderTable() {
     const tbody = document.getElementById('tableUnified');
     tbody.innerHTML = '';
@@ -503,16 +1032,18 @@ function renderTable() {
     const initCRC = parseFloat(document.getElementById('initCRC').value) || 0;
     const initUSD = parseFloat(document.getElementById('initUSD').value) || 0;
 
-    // Single running balance in USD for all rows
     let runningUSD = initUSD + (initCRC / exRate);
 
-    // Build combined list: CRC first then USD, calculating running USD balance
     const crcRows = dataCRC.map((item, idx) => {
-        runningUSD -= (item.amount / exRate);
+        if (!item.selected_card) {
+            runningUSD -= (item.amount / exRate);
+        }
         return {...item, _type:'CRC', _idx:idx, _bal:runningUSD};
     });
     const usdRows = dataUSD.map((item, idx) => {
-        runningUSD -= item.amount;
+        if (!item.selected_card) {
+            runningUSD -= item.amount;
+        }
         return {...item, _type:'USD', _idx:idx, _bal:runningUSD};
     });
     const rows = [...crcRows, ...usdRows];
@@ -521,7 +1052,7 @@ function renderTable() {
         const isCRC = item._type === 'CRC';
         const sym = isCRC ? '₡' : '$';
         const tr = document.createElement('tr');
-        tr.className = `border-b transition-colors ${item.selected ? 'selected-row' : ''}`;
+        tr.className = `border-b transition-colors ${item.selected ? 'selected-row' : ''} ${item.selected_card ? 'selected-card-row' : ''}`;
         tr.draggable = true;
         tr.ondragstart = e => handleDragStart(e, item._type, item._idx);
         tr.ondragend   = e => handleDragEnd(e);
@@ -529,16 +1060,30 @@ function renderTable() {
         tr.ondragleave = () => tr.classList.remove('drag-over');
         tr.ondrop      = e => handleDrop(e, item._type, item._idx);
 
-        const equivCell = isCRC
-            ? `<td class="text-right hide-mobile" style="white-space:nowrap;color:#94a3b8;font-size:11px">≈ ${fmt(item.amount/exRate,'$')}</td>`
-            : `<td class="hide-mobile"></td>`;
+        // Conversión bidireccional exacta para Egresos
+        const equivCellContent = isCRC
+            ? `≈ ${fmt(item.amount / exRate, '$')}`
+            : `≈ ${fmt(item.amount * exRate, '₡')}`;
+
+        const equivCell = `<td class="text-right hide-mobile" style="white-space:nowrap;color:#5f6368;font-size:11px">${equivCellContent}</td>`;
+
+        const cardCellContent = `
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-1.5">
+                <input type="checkbox" ${item.selected_card?'checked':''} onchange="toggleSelectedCard('${item._type}',${item.id},this.checked,this.closest('tr'))"
+                    class="w-4 h-4 rounded accent-emerald-600 cursor-pointer">
+                ${item.selected_card ? `
+                    <select onchange="updateItemCard('${item._type}',${item.id},this.value)" class="text-[10px] font-bold bg-white border border-gray-300 rounded px-1.5 py-0.5 focus:outline-none max-w-[100px] truncate cursor-pointer">
+                        ${creditCards.length > 0 ? creditCards.map(c => `<option value="${c.id}" ${item.card_id===c.id?'selected':''}>${c.name}</option>`).join('') : '<option value="">No hay tarjetas</option>'}
+                    </select>
+                ` : ''}
+            </div>
+        `;
 
         tr.innerHTML = `
             <td class="drag-handle px-2 py-3"><i data-lucide="grip-vertical" class="w-3.5 h-3.5"></i></td>
             <td class="px-2">
                 <select onchange="changeType('${item._type}',${item.id},this.value)"
-                    class="text-xs font-bold border-none outline-none cursor-pointer rounded-full px-2 py-1 ${isCRC?'bg-green-100 text-green-800':'bg-blue-100 text-blue-800'}"
-                    style="appearance:none;-webkit-appearance:none;">
+                    class="text-xs font-bold border border-gray-200 outline-none cursor-pointer rounded-full px-2 py-0.5 ${isCRC?'bg-green-50 text-green-700 border-green-200':'bg-blue-50 text-blue-700 border-blue-200'}">
                     <option value="CRC" ${isCRC?'selected':''}>CRC</option>
                     <option value="USD" ${!isCRC?'selected':''}>USD</option>
                 </select>
@@ -547,7 +1092,7 @@ function renderTable() {
             <td><input type="text" value="${escHtml(item.concept)}" onchange="updateItem('${item._type}',${item.id},'concept',this.value)" class="cell-input" style="min-width:140px"></td>
             <td class="text-right">
                 <div class="flex items-center justify-end gap-0.5">
-                    <span class="text-gray-300 text-xs">${sym}</span>
+                    <span class="text-gray-400 text-xs">${sym}</span>
                     <input type="number" value="${item.amount}" onchange="updateItem('${item._type}',${item.id},'amount',this.value)" class="cell-input amount-input font-semibold">
                 </div>
             </td>
@@ -555,6 +1100,9 @@ function renderTable() {
             <td class="text-center">
                 <input type="checkbox" ${item.selected?'checked':''} onchange="toggleSelected('${item._type}',${item.id},this.checked,this.closest('tr'))"
                     class="w-4 h-4 rounded accent-blue-600 cursor-pointer">
+            </td>
+            <td class="text-center">
+                ${cardCellContent}
             </td>
             <td class="text-right text-xs font-bold ${item._bal<0?'bal-neg':'bal-pos'}" style="white-space:nowrap">${fmt(item._bal,'$')}</td>
             <td class="px-2">
@@ -570,53 +1118,216 @@ function renderTable() {
     lucide.createIcons();
 }
 
-// Change currency type of an existing row
-window.changeType = (currentType, id, newType) => {
-    if (currentType === newType) return;
-    // Find item in current list
-    const srcList = currentType==='CRC' ? dataCRC : dataUSD;
-    const dstList = newType==='CRC' ? dataCRC : dataUSD;
-    const idx = srcList.findIndex(i=>i.id===id);
-    if (idx === -1) return;
-    const item = srcList.splice(idx, 1)[0];
-    dstList.push(item);
-    renderTable();
-    saveToCloud();
-};
+function renderReceivablesTable() {
+    const tbody = document.getElementById('tableReceivables');
+    tbody.innerHTML = '';
+    const exRate  = parseFloat(document.getElementById('exchangeRate').value) || 1;
 
-// Toggle selected without full re-render for snappiness
-window.toggleSelected = (type, id, checked, trEl) => {
-    const list = type==='CRC' ? dataCRC : dataUSD;
-    const item = list.find(i=>i.id===id);
-    if (item) { item.selected = checked; }
-    trEl.classList.toggle('selected-row', checked);
+    const crcRows = receivablesCRC.map((item, idx) => ({...item, _type:'CRC', _idx:idx}));
+    const usdRows = receivablesUSD.map((item, idx) => ({...item, _type:'USD', _idx:idx}));
+    const rows = [...crcRows, ...usdRows];
+
+    rows.forEach(item => {
+        const isCRC = item._type === 'CRC';
+        const sym = isCRC ? '₡' : '$';
+        const tr = document.createElement('tr');
+        tr.className = `border-b transition-colors ${item.selected ? 'selected-row' : ''}`;
+        tr.draggable = true;
+        tr.ondragstart = e => handleDragStart(e, item._type, item._idx);
+        tr.ondragend   = e => handleDragEnd(e);
+        tr.ondragover  = e => { e.preventDefault(); tr.classList.add('drag-over'); };
+        tr.ondragleave = () => tr.classList.remove('drag-over');
+        tr.ondrop      = e => handleDrop(e, item._type, item._idx);
+
+        // Conversión bidireccional exacta para Ingresos/Cobros
+        const equivCellContent = isCRC
+            ? `≈ ${fmt(item.amount / exRate, '$')}`
+            : `≈ ${fmt(item.amount * exRate, '₡')}`;
+
+        const equivCell = `<td class="text-right hide-mobile" style="white-space:nowrap;color:#5f6368;font-size:11px">${equivCellContent}</td>`;
+
+        tr.innerHTML = `
+            <td class="drag-handle px-2 py-3"><i data-lucide="grip-vertical" class="w-3.5 h-3.5"></i></td>
+            <td class="px-2">
+                <select onchange="changeReceivableType('${item._type}',${item.id},this.value)"
+                    class="text-xs font-bold border border-gray-200 outline-none cursor-pointer rounded-full px-2 py-0.5 ${isCRC?'bg-green-50 text-green-700 border-green-200':'bg-blue-50 text-blue-700 border-blue-200'}">
+                    <option value="CRC" ${isCRC?'selected':''}>CRC</option>
+                    <option value="USD" ${!isCRC?'selected':''}>USD</option>
+                </select>
+            </td>
+            <td><input type="date" value="${item.date}" onchange="updateReceivableItem('${item._type}',${item.id},'date',this.value)" class="cell-input text-xs" style="min-width:108px"></td>
+            <td><input type="text" value="${escHtml(item.client)}" onchange="updateReceivableItem('${item._type}',${item.id},'client',this.value)" class="cell-input" style="min-width:140px"></td>
+            <td class="text-right">
+                <div class="flex items-center justify-end gap-0.5">
+                    <span class="text-gray-400 text-xs">${sym}</span>
+                    <input type="number" value="${item.amount}" onchange="updateReceivableItem('${item._type}',${item.id},'amount',this.value)" class="cell-input amount-input font-semibold">
+                </div>
+            </td>
+            ${equivCell}
+            <td><input type="date" value="${item.tentativeDate}" onchange="updateReceivableItem('${item._type}',${item.id},'tentativeDate',this.value)" class="cell-input text-xs" style="min-width:108px"></td>
+            <td><input type="text" value="${escHtml(item.observations)}" onchange="updateReceivableItem('${item._type}',${item.id},'observations',this.value)" class="cell-input" style="min-width:140px"></td>
+            <td class="text-center">
+                <input type="checkbox" ${item.selected?'checked':''} onchange="toggleReceivableSelected('${item._type}',${item.id},this.checked,this.closest('tr'))"
+                    class="w-4 h-4 rounded accent-green-600 cursor-pointer">
+            </td>
+            <td class="px-2">
+                <button onclick="removeReceivableRow('${item._type}',${item.id})" class="text-gray-300 hover:text-red-500 p-1 rounded transition-colors">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+
     updateCalculations();
-    saveToCloud();
-};
+    lucide.createIcons();
+}
+
+function renderCards() {
+    const compGrid = document.getElementById('companyCardsGrid');
+    const luisGrid = document.getElementById('luisCardsGrid');
+    const khayGrid = document.getElementById('khayCardsGrid');
+    const newGrid  = document.getElementById('newCardsGrid');
+    const newSect  = document.getElementById('newCardsSection');
+    
+    compGrid.innerHTML = '';
+    luisGrid.innerHTML = '';
+    khayGrid.innerHTML = '';
+    newGrid.innerHTML = '';
+    newSect.style.display = 'none';
+    
+    const exRate = parseFloat(document.getElementById('exchangeRate').value) || 1;
+
+    creditCards.forEach((card, idx) => {
+        // Calcular cargos de esta tarjeta
+        const crcCharges = dataCRC
+            .filter(i => i.selected_card && i.card_id === card.id)
+            .reduce((sum, i) => sum + (i.amount / exRate), 0);
+            
+        const usdCharges = dataUSD
+            .filter(i => i.selected_card && i.card_id === card.id)
+            .reduce((sum, i) => sum + i.amount, 0);
+            
+        const charges = crcCharges + usdCharges;
+        const projected = card.available - charges;
+        
+        const usedAmount = card.limit - projected;
+        const pctUsed = Math.min(100, Math.max(0, (usedAmount / card.limit) * 100)) || 0;
+
+        const isLow = projected < (card.limit * 0.15);
+
+        const cardEl = document.createElement('div');
+        cardEl.className = "bg-white rounded-2xl p-4 shadow-sm border border-gray-200 relative overflow-hidden flex flex-col justify-between h-56 transition-all hover:shadow-md hover:border-gray-300";
+        
+        // Cabecera superior de acento dependiendo del grupo
+        let stripeColor = 'bg-brand-blue';
+        if (khayIds.includes(card.id)) stripeColor = 'bg-brand-green';
+        if (!companyIds.includes(card.id) && !luisIds.includes(card.id) && !khayIds.includes(card.id)) stripeColor = 'bg-brand-cyan';
+
+        cardEl.innerHTML = `
+            <div class="absolute top-0 left-0 right-0 h-1.5 ${stripeColor}"></div>
+            <!-- Header -->
+            <div class="flex justify-between items-start mt-1">
+                <div class="w-8 h-6 bg-amber-500/10 rounded border border-amber-500/20 flex items-center justify-center">
+                    <i data-lucide="cpu" class="w-4 h-4 text-amber-600"></i>
+                </div>
+                <img src="logo-aire-acondicionado-eco-ingenieria-energia-solar.png" alt="Eco" class="h-4 object-contain">
+            </div>
+            
+            <!-- Nombre de Tarjeta Editable -->
+            <div class="mt-2">
+                <input type="text" value="${escHtml(card.name)}" 
+                    onchange="updateCard(${idx}, 'name', this.value)" 
+                    class="bg-transparent border-b border-transparent hover:border-gray-200 focus:border-brand-blue focus:bg-gray-50 outline-none w-full font-bold text-gray-800 text-sm px-1 py-0.5 rounded transition-all"
+                    placeholder="Nombre de la tarjeta">
+                <div class="text-[8px] text-gray-400 uppercase tracking-widest font-semibold mt-0.5 px-1">Límite y Disp. (USD)</div>
+            </div>
+            
+            <!-- Controles Disponibles -->
+            <div class="grid grid-cols-2 gap-1.5 mt-2 text-[10px]">
+                <div>
+                    <span class="block text-[8px] text-gray-400 uppercase font-semibold px-1">Disponible</span>
+                    <div class="flex items-center bg-gray-50 rounded px-1.5 py-1 mt-0.5 border border-gray-200 focus-within:border-brand-blue transition-all">
+                        <span class="text-gray-500 mr-0.5">$</span>
+                        <input type="number" step="0.01" value="${card.available}" 
+                            onchange="updateCard(${idx}, 'available', this.value)" 
+                            class="bg-transparent border-none outline-none w-full font-bold text-gray-700 text-xs">
+                    </div>
+                </div>
+                <div>
+                    <span class="block text-[8px] text-gray-400 uppercase font-semibold px-1">Límite</span>
+                    <div class="flex items-center bg-gray-50 rounded px-1.5 py-1 mt-0.5 border border-gray-200 focus-within:border-brand-blue transition-all">
+                        <span class="text-gray-500 mr-0.5">$</span>
+                        <input type="number" step="0.01" value="${card.limit}" 
+                            onchange="updateCard(${idx}, 'limit', this.value)" 
+                            class="bg-transparent border-none outline-none w-full font-bold text-gray-700 text-xs">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Barra de Progreso -->
+            <div class="mt-3">
+                <div class="w-full bg-gray-100 rounded-full h-1.5">
+                    <div class="h-1.5 rounded-full transition-all ${isLow ? 'bg-red-500' : 'bg-brand-green'}" style="width: ${pctUsed}%"></div>
+                </div>
+            </div>
+
+            <!-- Footer con saldos reales y botón de eliminar -->
+            <div class="mt-2 pt-2 border-t border-gray-100 flex justify-between items-center text-[9px] text-gray-500">
+                <div class="flex items-center gap-1.5">
+                    <span>Proy:</span>
+                    <span class="font-extrabold ${isLow?'text-red-500':'text-brand-green'}">$${projected.toFixed(2)}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="font-semibold">${pctUsed.toFixed(0)}% uso</span>
+                    <button onclick="removeCard(${idx})" class="text-gray-400 hover:text-red-500 transition-colors p-0.5 rounded" title="Eliminar tarjeta">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        // Agrupar en la grilla correspondiente
+        if (companyIds.includes(card.id)) {
+            compGrid.appendChild(cardEl);
+        } else if (luisIds.includes(card.id)) {
+            luisGrid.appendChild(cardEl);
+        } else if (khayIds.includes(card.id)) {
+            khayGrid.appendChild(cardEl);
+        } else {
+            newGrid.appendChild(cardEl);
+            newSect.style.display = 'block';
+        }
+    });
+    lucide.createIcons();
+}
 
 // ── Calculations ───────────────────────────────────────────
 function updateCalculations() {
     const exRate  = parseFloat(document.getElementById('exchangeRate').value) || 1;
     const initCRC = parseFloat(document.getElementById('initCRC').value) || 0;
     const initUSD = parseFloat(document.getElementById('initUSD').value) || 0;
+    const initCaja = parseFloat(document.getElementById('initCajaChica').value) || 0;
+    const cajaCurrency = document.getElementById('cajaChicaCurrency').value || 'CRC';
+    
     document.getElementById('tcDisplay').textContent = exRate.toLocaleString('es-CR');
 
-    // Disponible = solo los fondos iniciales, sin restar nada
-    const totalDisp = initUSD + (initCRC / exRate);
+    // Caja chica en USD
+    const cajaChicaUSD = cajaCurrency === 'CRC' ? (initCaja / exRate) : initCaja;
+    document.getElementById('dispCajaChica').textContent = fmt(initCaja, cajaCurrency === 'CRC' ? '₡' : '$');
 
-    // Saldo proyectado = fondo menos todos los movimientos
-    const finalCRC = dataCRC.reduce((s,i) => s - i.amount, initCRC);
-    const finalUSD = dataUSD.reduce((s,i) => s - i.amount, initUSD);
+    // Disponible inicial Bancos + Caja Chica
+    const banksInitUSD = initUSD + (initCRC / exRate);
+    const totalDisp = banksInitUSD + cajaChicaUSD;
 
-    setFundVal('dispCRC', initCRC, '₡');
-    setFundVal('dispUSD', initUSD, '$');
+    document.getElementById('dispCRC').textContent = fmt(initCRC, '₡');
+    document.getElementById('dispUSD').textContent = fmt(initUSD, '$');
+    
     const dtEl = document.getElementById('dispTotal');
     dtEl.textContent = fmt(totalDisp, '$');
     dtEl.className = `fund-value global${totalDisp<0?' neg':''}`;
 
-    // Use finalCRC/finalUSD for global balance at bottom
-
-    // Selected to pay
+    // 1. Egresos Bancarios Seleccionados
     const selCRC = dataCRC.filter(i=>i.selected);
     const selUSD = dataUSD.filter(i=>i.selected);
     const sumCRC = selCRC.reduce((s,i)=>s+i.amount,0);
@@ -627,35 +1338,108 @@ function updateCalculations() {
     setPayVal('paySubCRC', sumCRC, '₡', selCRC.length, 'payCountCRC');
     setPayVal('paySubUSD', sumUSD, '$', selUSD.length, 'payCountUSD');
     const ptEl = document.getElementById('payTotal');
-    ptEl.textContent = fmt(sumTotal, '$');
-    ptEl.className = `pay-value${sumTotal===0?' zero':''}`;
-    document.getElementById('payCountTotal').textContent = `${totalSel} movimiento${totalSel!==1?'s':''} seleccionado${totalSel!==1?'s':''}`;
+    if(ptEl) {
+        ptEl.textContent = fmt(sumTotal, '$');
+        ptEl.className = `pay-value${sumTotal===0?' zero':' highlight-val'}`;
+    }
+    const pctEl = document.getElementById('payCountTotal');
+    if(pctEl) pctEl.textContent = `${totalSel} movimiento${totalSel!==1?'s':''}`;
 
-    // Global = fondo inicial menos todos los movimientos
-    const globalUSD = finalUSD + (finalCRC / exRate);
-    const gEl = document.getElementById('totalConsolidated');
-    gEl.textContent = fmt(globalUSD, '$');
-    gEl.className = `global-amount${globalUSD<0?' negative':''}`;
-    document.getElementById('labelGlobal').textContent = globalUSD<0 ? 'Total dinero necesario (USD)' : 'Saldo total proyectado (USD)';
+    // 2. Egresos con Tarjeta Seleccionados
+    const selCardCRC = dataCRC.filter(i=>i.selected_card);
+    const selCardUSD = dataUSD.filter(i=>i.selected_card);
+    const sumCardCRC = selCardCRC.reduce((s,i)=>s+i.amount,0);
+    const sumCardUSD = selCardUSD.reduce((s,i)=>s+i.amount,0);
+    const sumCardTotal = sumCardUSD + (sumCardCRC / exRate);
+    const totalCardSel = selCardCRC.length + selCardUSD.length;
+
+    setPayVal('cardPaySubCRC', sumCardCRC, '₡', selCardCRC.length, 'cardPayCountCRC');
+    setPayVal('cardPaySubUSD', sumCardUSD, '$', selCardUSD.length, 'cardPayCountUSD');
+    const cptEl = document.getElementById('cardPayTotal');
+    if(cptEl) {
+        cptEl.textContent = fmt(sumCardTotal, '$');
+        cptEl.className = `pay-value${sumCardTotal===0?' zero':' highlight-green-val'}`;
+    }
+    const cpctEl = document.getElementById('cardPayCountTotal');
+    if(cpctEl) cpctEl.textContent = `${totalCardSel} cargo${totalCardSel!==1?'s':''}`;
+
+    // 3. Saldo Bancario Proyectado (Fondo Inicial - TODOS los egresos sin tarjeta)
+    const finalCRC = dataCRC.filter(i=>!i.selected_card).reduce((s,i) => s - i.amount, initCRC);
+    const finalUSD = dataUSD.filter(i=>!i.selected_card).reduce((s,i) => s - i.amount, initUSD);
+    const globalBankUSD = finalUSD + (finalCRC / exRate);
+
+    // 4. Cuentas por Cobrar Seleccionadas
+    const selRecCRC = receivablesCRC.filter(i=>i.selected);
+    const selRecUSD = receivablesUSD.filter(i=>i.selected);
+    const sumRecCRC = selRecCRC.reduce((s,i)=>s+i.amount,0);
+    const sumRecUSD = selRecUSD.reduce((s,i)=>s+i.amount,0);
+    const sumRecTotal = sumRecUSD + (sumRecCRC / exRate);
+    const totalRecSel = selRecCRC.length + selRecUSD.length;
+
+    setPayVal('recSubCRC', sumRecCRC, '₡', selRecCRC.length, 'recCountCRC');
+    setPayVal('recSubUSD', sumRecUSD, '$', selRecUSD.length, 'recCountUSD');
+    const rtEl = document.getElementById('recTotal');
+    if(rtEl) {
+        rtEl.textContent = fmt(sumRecTotal, '$');
+        rtEl.className = `pay-value${sumRecTotal===0?' zero':' highlight-green-val'}`;
+    }
+    const rctEl = document.getElementById('recCountTotal');
+    if(rctEl) rctEl.textContent = `${totalRecSel} cuenta${totalRecSel!==1?'s':''} seleccionada${totalRecSel!==1?'s':''}`;
+
+    // 5. Totales de Tarjetas de Crédito
+    let initCardAvailable = 0;
+    let totalLimit = 0;
+    creditCards.forEach(c => {
+        initCardAvailable += c.available;
+        totalLimit += c.limit;
+    });
+    
+    const totalCharges = sumCardTotal; 
+    const finalCardAvailable = initCardAvailable - totalCharges;
+
+    const tcaEl = document.getElementById('totalCardAvailable');
+    if(tcaEl) tcaEl.textContent = fmt(finalCardAvailable, '$');
+    const tclEl = document.getElementById('totalCardLimit');
+    if(tclEl) tclEl.textContent = fmt(totalLimit, '$');
+    const tccEl = document.getElementById('totalCardCharges');
+    if(tccEl) tccEl.textContent = fmt(totalCharges, '$');
+    const tciaEl = document.getElementById('totalCardInitAvailable');
+    if(tciaEl) tciaEl.textContent = fmt(initCardAvailable, '$');
+
+    // 6. Proyecciones en Dashboard Global
+    document.getElementById('dashBancos').textContent = fmt(globalBankUSD, '$');
+    document.getElementById('dashBancos').className = `text-xl font-extrabold ${globalBankUSD<0?'text-red-500':'text-brand-blue'}`;
+    
+    document.getElementById('dashCajaChica').textContent = fmt(cajaChicaUSD, '$');
+    document.getElementById('dashIngresos').textContent = '+' + fmt(sumRecTotal, '$');
+    
+    // Proyección de Liquidez Final = Bancos Proyectados + Caja Chica + Cuentas por Cobrar Seleccionadas
+    const finalLiquidity = globalBankUSD + cajaChicaUSD + sumRecTotal;
+    const dlEl = document.getElementById('dashTotal');
+    dlEl.textContent = fmt(finalLiquidity, '$');
+    dlEl.className = `text-2xl font-black ${finalLiquidity<0?'text-red-500':'text-brand-green'}`;
 }
 
 function fmt(val, sym) {
     return (val<0?'-':'')+sym+Math.abs(val).toLocaleString('es-CR',{minimumFractionDigits:2,maximumFractionDigits:2});
 }
-function setFundVal(id, val, sym) {
-    const el = document.getElementById(id);
-    el.textContent = fmt(val, sym);
-    el.className = `fund-value${val<0?' neg':' pos'}`;
-}
 function setPayVal(id, val, sym, count, countId) {
     const el = document.getElementById(id);
-    el.textContent = fmt(val, sym);
-    el.className = `pay-value${val===0?' zero':''}`;
-    document.getElementById(countId).textContent = `${count} movimiento${count!==1?'s':''}`;
+    if(el) {
+        el.textContent = fmt(val, sym);
+        el.className = `pay-value${val===0?' zero':''}`;
+    }
+    const cEl = document.getElementById(countId);
+    if(cEl) {
+        cEl.textContent = `${count} cuenta${count!==1?'s':''}`;
+    }
 }
 function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
 
-window.onload = () => { startSync(); lucide.createIcons(); };
+window.onload = () => { 
+    startSync(); 
+    lucide.createIcons(); 
+};
 </script>
 
 <script>
