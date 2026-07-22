@@ -573,21 +573,21 @@ const khayIds = ['walmart_khay', 'pricemaart_khay', 'cashback'];
 // Tarjetas inicializadas a partir del PDF de disponibles cargado por el usuario
 const defaultCards = [
     // Empresa
-    { id: 'ae_luis', name: 'AE Luis', limit: 2000.00, available: 95.90 },
-    { id: 'ae_khay', name: 'AE Khay', limit: 2000.00, available: 500.00 },
-    { id: 'mc_luis', name: 'MC Luis', limit: 2000.00, available: 218.14 },
-    { id: 'mc_khay', name: 'MC Khay', limit: 2000.00, available: 500.00 },
-    { id: 'visa_luis', name: 'Visa Luis', limit: 5000.00, available: 1510.94 },
-    { id: 'visa_khay', name: 'Visa Khay', limit: 5000.00, available: 720.14 },
-    { id: 'pyme', name: 'Pyme', limit: 5000.00, available: 801.00 },
+    { id: 'ae_luis', name: 'AE Luis', limit: 2000.00, available: 95.90, group: 'empresa' },
+    { id: 'ae_khay', name: 'AE Khay', limit: 2000.00, available: 500.00, group: 'empresa' },
+    { id: 'mc_luis', name: 'MC Luis', limit: 2000.00, available: 218.14, group: 'empresa' },
+    { id: 'mc_khay', name: 'MC Khay', limit: 2000.00, available: 500.00, group: 'empresa' },
+    { id: 'visa_luis', name: 'Visa Luis', limit: 5000.00, available: 1510.94, group: 'empresa' },
+    { id: 'visa_khay', name: 'Visa Khay', limit: 5000.00, available: 720.14, group: 'empresa' },
+    { id: 'pyme', name: 'Pyme', limit: 5000.00, available: 801.00, group: 'empresa' },
     // Personal de Luis
-    { id: 'walmart_luis', name: 'Walmart 09/07 (Luis)', limit: 5000.00, available: 4012.96 },
-    { id: 'pricemart_luis', name: 'Pricemart Luis', limit: 5000.00, available: -3804.61 },
-    { id: 'connet_millas', name: 'Connet y Millas', limit: 2000.00, available: 200.00 },
+    { id: 'walmart_luis', name: 'Walmart 09/07 (Luis)', limit: 5000.00, available: 4012.96, group: 'luis' },
+    { id: 'pricemart_luis', name: 'Pricemart Luis', limit: 5000.00, available: -3804.61, group: 'luis' },
+    { id: 'connet_millas', name: 'Connet y Millas', limit: 2000.00, available: 200.00, group: 'luis' },
     // Personal de Khay
-    { id: 'walmart_khay', name: 'Walmart Khay', limit: 2000.00, available: 266.05 },
-    { id: 'pricemaart_khay', name: 'Pricemaart Khay', limit: 2000.00, available: -574.94 },
-    { id: 'cashback', name: 'Cashback', limit: 1000.00, available: 99.42 }
+    { id: 'walmart_khay', name: 'Walmart Khay', limit: 2000.00, available: 266.05, group: 'khay' },
+    { id: 'pricemaart_khay', name: 'Pricemaart Khay', limit: 2000.00, available: -574.94, group: 'khay' },
+    { id: 'cashback', name: 'Cashback', limit: 1000.00, available: 99.42, group: 'khay' }
 ];
 
 // ── Navegación de Tabs ────────────────────────────────────
@@ -628,7 +628,35 @@ async function startSync() {
             }));
             receivablesCRC = (d.receivablesCRC || []).map(i => ({...i, selected: i.selected || false}));
             receivablesUSD = (d.receivablesUSD || []).map(i => ({...i, selected: i.selected || false}));
-            creditCards = d.creditCards !== undefined ? d.creditCards : defaultCards;
+            creditCards = (d.creditCards !== undefined ? d.creditCards : defaultCards).map(card => {
+                let group = card.group;
+                if (!group) {
+                    if (companyIds.includes(card.id)) group = 'empresa';
+                    else if (luisIds.includes(card.id)) group = 'luis';
+                    else if (khayIds.includes(card.id)) group = 'khay';
+                    else {
+                        const name = (card.name || '').toLowerCase();
+                        if (name.includes('luis')) {
+                            if (name.includes('ae') || name.includes('mc') || name.includes('visa')) {
+                                group = 'empresa';
+                            } else {
+                                group = 'luis';
+                            }
+                        } else if (name.includes('khay')) {
+                            if (name.includes('ae') || name.includes('mc') || name.includes('visa')) {
+                                group = 'empresa';
+                            } else {
+                                group = 'khay';
+                            }
+                        } else if (name.includes('pyme')) {
+                            group = 'empresa';
+                        } else {
+                            group = 'otro';
+                        }
+                    }
+                }
+                return { ...card, group };
+            });
             
             document.getElementById('exchangeRate').value = d.exchangeRate || 512;
             document.getElementById('initCRC').value      = d.initCRC || 0;
@@ -1221,8 +1249,8 @@ function renderCards() {
         
         // Cabecera superior de acento dependiendo del grupo
         let stripeColor = 'bg-brand-blue';
-        if (khayIds.includes(card.id)) stripeColor = 'bg-brand-green';
-        if (!companyIds.includes(card.id) && !luisIds.includes(card.id) && !khayIds.includes(card.id)) stripeColor = 'bg-brand-cyan';
+        if (card.group === 'khay') stripeColor = 'bg-brand-green';
+        if (card.group === 'otro') stripeColor = 'bg-brand-cyan';
 
         cardEl.innerHTML = `
             <div class="absolute top-0 left-0 right-0 h-1.5 ${stripeColor}"></div>
@@ -1236,10 +1264,20 @@ function renderCards() {
             
             <!-- Nombre de Tarjeta Editable -->
             <div class="mt-2">
-                <input type="text" value="${escHtml(card.name)}" 
-                    onchange="updateCard(${idx}, 'name', this.value)" 
-                    class="bg-transparent border-b border-transparent hover:border-gray-200 focus:border-brand-blue focus:bg-gray-50 outline-none w-full font-bold text-gray-800 text-sm px-1 py-0.5 rounded transition-all"
-                    placeholder="Nombre de la tarjeta">
+                <div class="flex justify-between items-center gap-1">
+                    <input type="text" value="${escHtml(card.name)}" 
+                        onchange="updateCard(${idx}, 'name', this.value)" 
+                        class="bg-transparent border-b border-transparent hover:border-gray-200 focus:border-brand-blue focus:bg-gray-50 outline-none w-full font-bold text-gray-800 text-sm px-1 py-0.5 rounded transition-all"
+                        placeholder="Nombre de la tarjeta">
+                    
+                    <select onchange="updateCard(${idx}, 'group', this.value)" 
+                        class="text-[9px] font-extrabold bg-gray-50 border border-gray-200 rounded px-1 py-0.5 focus:outline-none cursor-pointer text-gray-500 uppercase tracking-wider">
+                        <option value="empresa" ${card.group==='empresa'?'selected':''}>Empresa</option>
+                        <option value="luis" ${card.group==='luis'?'selected':''}>Luis</option>
+                        <option value="khay" ${card.group==='khay'?'selected':''}>Khay</option>
+                        <option value="otro" ${card.group==='otro'?'selected':''}>Nuevo</option>
+                    </select>
+                </div>
                 <div class="text-[8px] text-gray-400 uppercase tracking-widest font-semibold mt-0.5 px-1">Límite y Disp. (USD)</div>
             </div>
             
@@ -1288,11 +1326,11 @@ function renderCards() {
         `;
         
         // Agrupar en la grilla correspondiente
-        if (companyIds.includes(card.id)) {
+        if (card.group === 'empresa') {
             compGrid.appendChild(cardEl);
-        } else if (luisIds.includes(card.id)) {
+        } else if (card.group === 'luis') {
             luisGrid.appendChild(cardEl);
-        } else if (khayIds.includes(card.id)) {
+        } else if (card.group === 'khay') {
             khayGrid.appendChild(cardEl);
         } else {
             newGrid.appendChild(cardEl);
