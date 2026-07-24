@@ -89,8 +89,7 @@
 
         /* Resumen Egresos */
         .pay-panel { background: #ffffff; border-radius: 16px; padding: 22px 24px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
-        .pay-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-        @media (max-width: 768px) { .pay-grid { grid-template-columns: 1fr; gap: 10px; } }
+        .pay-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(125px, 1fr)); gap: 14px; }
         .pay-box { background: #f8f9fa; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 18px; }
         .pay-box.highlight { background: #e8f0fe; border-color: #d2e3fc; }
         .pay-box.highlight-green { background: #e6f4ea; border-color: #ceead6; }
@@ -116,9 +115,12 @@
         .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #202124; color: #fff; padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; z-index: 2000; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
         .toast.show { opacity: 1; }
 
-        .nav-tab-btn { position: relative; color: #5f6368; font-weight: 700; }
+        .nav-tab-btn { position: relative; color: #5f6368; font-weight: 700; flex-shrink: 0; white-space: nowrap; }
         .nav-tab-btn.active { color: #2167AF; }
         .nav-tab-btn.active::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 3px; background-color: #2167AF; border-radius: 3px 3px 0 0; }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
         @media (max-width: 640px) { .hide-mobile { display: none !important; } thead th, tbody td { padding: 6px 8px; } }
         @media (min-width: 1024px) { thead th { padding: 12px 14px; } tbody td { padding: 10px 14px; } }
@@ -173,6 +175,49 @@
     </div>
 </div>
 
+<!-- Trash Modal -->
+<div id="trashModal" class="modal-overlay" style="display:none">
+    <div class="modal-box max-w-2xl">
+        <div class="flex justify-between items-center mb-4">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center">
+                    <i data-lucide="trash-2" class="w-5 h-5 text-red-500"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800">Papelera de Reciclaje</h3>
+            </div>
+            <button onclick="closeTrashModal()" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+        
+        <div class="max-h-[350px] overflow-y-auto border border-gray-105 rounded-lg mb-4">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-2 text-left text-[10px] font-bold text-gray-500 uppercase tracking-wider">Tipo</th>
+                        <th class="px-4 py-2 text-left text-[10px] font-bold text-gray-500 uppercase tracking-wider">Detalle</th>
+                        <th class="px-4 py-2 text-right text-[10px] font-bold text-gray-500 uppercase tracking-wider">Monto</th>
+                        <th class="px-4 py-2 text-center text-[10px] font-bold text-gray-500 uppercase tracking-wider">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="trashTableBody" class="bg-white divide-y divide-gray-100 text-xs">
+                </tbody>
+            </table>
+            <div id="trashEmptyState" class="p-8 text-center text-gray-400 space-y-2">
+                <i data-lucide="archive" class="w-8 h-8 mx-auto text-gray-300"></i>
+                <p class="text-xs">La papelera está vacía</p>
+            </div>
+        </div>
+        
+        <div class="flex justify-between items-center">
+            <button id="emptyTrashBtn" onclick="emptyTrash()" class="px-4 py-2 text-xs font-bold text-red-600 hover:bg-red-50 rounded-lg transition-colors flex items-center gap-1.5 border border-transparent hover:border-red-100">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Vaciar Papelera
+            </button>
+            <button onclick="closeTrashModal()" class="px-4 py-2 bg-gray-100 text-gray-700 hover:bg-gray-200 text-xs font-bold rounded-lg transition-colors">
+                Cerrar
+            </button>
+        </div>
+    </div>
+</div>
+
 <!-- ═══ HEADER ═══ -->
 <div class="app-header px-4 py-3 sticky top-0 z-50 shadow-sm">
     <div class="max-w-[1600px] mx-auto flex flex-wrap items-center justify-between gap-3">
@@ -206,6 +251,11 @@
             <button id="installBtn" onclick="installPWA()" class="btn-ghost text-xs" style="display:none">
                 <i data-lucide="smartphone" class="w-4 h-4"></i><span class="hide-mobile">Instalar</span>
             </button>
+            <button onclick="openTrashModal()" class="btn-ghost text-xs relative">
+                <i data-lucide="trash-2" class="w-4 h-4 text-gray-550"></i>
+                <span class="hide-mobile">Papelera</span>
+                <span id="trashCountBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center hidden">0</span>
+            </button>
             <button onclick="copyShareLink()" class="btn-primary text-xs">
                 <i data-lucide="share-2" class="w-4 h-4"></i><span class="hide-mobile">Compartir</span>
             </button>
@@ -215,7 +265,7 @@
 
 <!-- ═══ NAVIGATION TABS ═══ -->
 <div class="max-w-[1600px] mx-auto px-4 mt-6">
-    <div class="flex border-b border-gray-200">
+    <div class="flex border-b border-gray-200 overflow-x-auto no-scrollbar scroll-smooth">
         <button id="tabBtnEgresos" onclick="switchTab('egresos')" class="nav-tab-btn active px-5 py-3 text-xs sm:text-sm font-bold transition-all flex items-center gap-2">
             <i data-lucide="arrow-down-right" class="w-4 h-4"></i> Egresos (Bancos)
         </button>
@@ -269,6 +319,15 @@
                 <div class="text-xs text-gray-400 mt-3">Bancos + Caja Chica en USD</div>
             </div>
         </div>
+    </div>
+
+    <!-- Barra de Búsqueda Rápida (Solo visible en Egresos y Cobrar) -->
+    <div id="searchBarContainer" class="flex items-center gap-2 bg-white rounded-xl border border-gray-200 px-3.5 py-2.5 shadow-sm focus-within:border-brand-blue focus-within:ring-1 focus-within:ring-brand-blue/20 transition-all max-w-[1600px] mx-auto">
+        <i data-lucide="search" class="w-4 h-4 text-gray-400"></i>
+        <input type="text" id="quickSearch" placeholder="Búsqueda rápida por concepto, cliente, fecha o monto..." class="bg-transparent border-none outline-none w-full text-sm text-gray-700" oninput="onSearchInput()">
+        <button id="clearSearchBtn" onclick="clearSearch()" class="text-gray-400 hover:text-gray-600 hidden">
+            <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
     </div>
 
 
@@ -642,15 +701,6 @@
             <span>T.C. de Conversión: ₡<span id="tcDisplay">512.00</span></span>
         </div>
     </div>
-
-</div>
-</div>
-
-<div class="max-w-[1600px] mx-auto px-4 pb-8">
-    <p class="text-center text-xs text-gray-500">Flujo de Caja Eco Ingeniería · Sincronización colaborativa en tiempo real</p>
-</div>
-
-<!-- ═══ FIREBASE + LÓGICA ═══ -->
 <script type="module">
 import { initializeApp }       from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -671,22 +721,21 @@ const auth = getAuth(app);
 const db   = getFirestore(app);
 
 // Data local
-let dataCRC = [], dataUSD = [];
-let receivablesCRC = [], receivablesUSD = [];
+let egresos = [];
+let cobros = [];
+let trash = [];
 let creditCards = [];
 let activeTab = 'egresos';
-
-let draggedItem = null, dragSrcType = '';
+let searchQuery = '';
+let draggedId = null;
 let isSaving = false;
 
-// Listas de ID fijas para agrupación
+// Configuración de tarjetas
 const companyIds = ['ae_luis', 'ae_khay', 'mc_luis', 'mc_khay', 'visa_luis', 'visa_khay', 'pyme'];
 const luisIds = ['walmart_luis', 'pricemart_luis', 'connet_millas'];
 const khayIds = ['walmart_khay', 'pricemaart_khay', 'cashback'];
 
-// Tarjetas inicializadas a partir del PDF de disponibles cargado por el usuario
 const defaultCards = [
-    // Empresa
     { id: 'ae_luis', name: 'AE Luis', limit: 2000.00, available: 95.90, group: 'empresa' },
     { id: 'ae_khay', name: 'AE Khay', limit: 2000.00, available: 500.00, group: 'empresa' },
     { id: 'mc_luis', name: 'MC Luis', limit: 2000.00, available: 218.14, group: 'empresa' },
@@ -694,11 +743,9 @@ const defaultCards = [
     { id: 'visa_luis', name: 'Visa Luis', limit: 5000.00, available: 1510.94, group: 'empresa' },
     { id: 'visa_khay', name: 'Visa Khay', limit: 5000.00, available: 720.14, group: 'empresa' },
     { id: 'pyme', name: 'Pyme', limit: 5000.00, available: 801.00, group: 'empresa' },
-    // Personal de Luis
     { id: 'walmart_luis', name: 'Walmart 09/07 (Luis)', limit: 5000.00, available: 4012.96, group: 'luis' },
     { id: 'pricemart_luis', name: 'Pricemart Luis', limit: 5000.00, available: -3804.61, group: 'luis' },
     { id: 'connet_millas', name: 'Connet y Millas', limit: 2000.00, available: 200.00, group: 'luis' },
-    // Personal de Khay
     { id: 'walmart_khay', name: 'Walmart Khay', limit: 2000.00, available: 266.05, group: 'khay' },
     { id: 'pricemaart_khay', name: 'Pricemaart Khay', limit: 2000.00, available: -574.94, group: 'khay' },
     { id: 'cashback', name: 'Cashback', limit: 1000.00, available: 99.42, group: 'khay' }
@@ -707,9 +754,7 @@ const defaultCards = [
 // ── Navegación de Tabs ────────────────────────────────────
 window.switchTab = (tabName) => {
     activeTab = tabName;
-    
     document.querySelectorAll('.nav-tab-btn').forEach(btn => btn.classList.remove('active'));
-    
     document.getElementById('tabContentEgresos').style.display = tabName === 'egresos' ? 'block' : 'none';
     document.getElementById('tabContentCobrar').style.display = tabName === 'cobrar' ? 'block' : 'none';
     document.getElementById('tabContentTarjetas').style.display = tabName === 'tarjetas' ? 'block' : 'none';
@@ -718,6 +763,8 @@ window.switchTab = (tabName) => {
     if (tabName === 'cobrar') document.getElementById('tabBtnCobrar').classList.add('active');
     if (tabName === 'tarjetas') document.getElementById('tabBtnTarjetas').classList.add('active');
     
+    const searchContainer = document.getElementById('searchBarContainer');
+    if (searchContainer) searchContainer.style.display = tabName === 'tarjetas' ? 'none' : 'flex';
     lucide.createIcons();
 };
 
@@ -728,46 +775,35 @@ async function startSync() {
     onSnapshot(docRef, (snap) => {
         if (snap.exists() && !isSaving) {
             const d = snap.data();
-            dataCRC = (d.dataCRC || []).map(i => ({
-                ...i, 
-                selected: i.selected || false,
-                selected_card: i.selected_card || false,
-                card_id: i.card_id || 'ae_luis'
-            }));
-            dataUSD = (d.dataUSD || []).map(i => ({
-                ...i, 
-                selected: i.selected || false,
-                selected_card: i.selected_card || false,
-                card_id: i.card_id || 'ae_luis'
-            }));
-            receivablesCRC = (d.receivablesCRC || []).map(i => ({...i, selected: i.selected || false}));
-            receivablesUSD = (d.receivablesUSD || []).map(i => ({...i, selected: i.selected || false}));
+            
+            // Cargar egresos con soporte de migración
+            if (d.egresos) {
+                egresos = d.egresos.map(i => ({ ...i, selected: i.selected || false, selected_card: i.selected_card || false, card_id: i.card_id || 'ae_luis' }));
+            } else {
+                const crc = (d.dataCRC || []).map(i => ({ ...i, currency: 'CRC', selected: i.selected || false, selected_card: i.selected_card || false, card_id: i.card_id || 'ae_luis' }));
+                const usd = (d.dataUSD || []).map(i => ({ ...i, currency: 'USD', selected: i.selected || false, selected_card: i.selected_card || false, card_id: i.card_id || 'ae_luis' }));
+                egresos = [...crc, ...usd];
+            }
+
+            // Cargar cobros con soporte de migración
+            if (d.cobros) {
+                cobros = d.cobros.map(i => ({ ...i, selected: i.selected || false }));
+            } else {
+                const crc = (d.receivablesCRC || []).map(i => ({ ...i, currency: 'CRC', selected: i.selected || false }));
+                const usd = (d.receivablesUSD || []).map(i => ({ ...i, currency: 'USD', selected: i.selected || false }));
+                cobros = [...crc, ...usd];
+            }
+
+            trash = d.trash || [];
+            updateTrashBadge();
+            
             creditCards = (d.creditCards !== undefined ? d.creditCards : defaultCards).map(card => {
                 let group = card.group;
                 if (!group) {
                     if (companyIds.includes(card.id)) group = 'empresa';
                     else if (luisIds.includes(card.id)) group = 'luis';
                     else if (khayIds.includes(card.id)) group = 'khay';
-                    else {
-                        const name = (card.name || '').toLowerCase();
-                        if (name.includes('luis')) {
-                            if (name.includes('ae') || name.includes('mc') || name.includes('visa')) {
-                                group = 'empresa';
-                            } else {
-                                group = 'luis';
-                            }
-                        } else if (name.includes('khay')) {
-                            if (name.includes('ae') || name.includes('mc') || name.includes('visa')) {
-                                group = 'empresa';
-                            } else {
-                                group = 'khay';
-                            }
-                        } else if (name.includes('pyme')) {
-                            group = 'empresa';
-                        } else {
-                            group = 'otro';
-                        }
-                    }
+                    else group = 'otro';
                 }
                 return { ...card, group };
             });
@@ -780,12 +816,9 @@ async function startSync() {
             
             if (d.lastUpdate) {
                 const dt = new Date(d.lastUpdate);
-                document.getElementById('lastUpdateDisplay').textContent =
-                    'Actualizado: ' + dt.toLocaleTimeString('es-CR', {hour:'2-digit',minute:'2-digit'});
+                document.getElementById('lastUpdateDisplay').textContent = 'Actualizado: ' + dt.toLocaleTimeString('es-CR', {hour:'2-digit',minute:'2-digit'});
             }
-            renderTable();
-            renderReceivablesTable();
-            renderCards();
+            renderTable(); renderReceivablesTable(); renderCards();
             setSyncStatus('Sincronizado', '#6BB54E');
         } else if (!snap.exists()) {
             creditCards = defaultCards;
@@ -794,30 +827,29 @@ async function startSync() {
     }, () => setSyncStatus('Error de conexión', '#ef4444'));
 }
 
-// ── Save ──────────────────────────────────────────────────
 window.saveToCloud = async () => {
     if (!auth.currentUser) return;
     isSaving = true;
     setSyncStatus('Guardando...', '#f59e0b', true);
     const state = {
-        dataCRC, dataUSD,
-        receivablesCRC, receivablesUSD,
+        egresos, cobros, trash,
+        dataCRC: egresos.filter(i => i.currency === 'CRC'),
+        dataUSD: egresos.filter(i => i.currency === 'USD'),
+        receivablesCRC: cobros.filter(i => i.currency === 'CRC'),
+        receivablesUSD: cobros.filter(i => i.currency === 'USD'),
         creditCards,
         exchangeRate: parseFloat(document.getElementById('exchangeRate').value) || 512,
-        initCRC:      parseFloat(document.getElementById('initCRC').value) || 0,
-        initUSD:      parseFloat(document.getElementById('initUSD').value) || 0,
+        initCRC: parseFloat(document.getElementById('initCRC').value) || 0,
+        initUSD: parseFloat(document.getElementById('initUSD').value) || 0,
         initCajaChica: parseFloat(document.getElementById('initCajaChica').value) || 0,
         cajaChicaCurrency: document.getElementById('cajaChicaCurrency').value || 'CRC',
-        lastUpdate:   new Date().toISOString()
+        lastUpdate: new Date().toISOString()
     };
     try {
         await setDoc(doc(db, 'flujo_caja', DOCUMENT_ID), state);
         setTimeout(() => { isSaving = false; }, 800);
         setSyncStatus('Sincronizado', '#6BB54E');
-    } catch(e) {
-        setSyncStatus('Error al guardar', '#ef4444');
-        isSaving = false;
-    }
+    } catch(e) { setSyncStatus('Error al guardar', '#ef4444'); isSaving = false; }
     updateCalculations();
 };
 
@@ -834,21 +866,13 @@ window.showToast = (msg) => {
     setTimeout(() => t.classList.remove('show'), 2800);
 };
 
-// ── Helper CSV/Parse (Importación Corregida) ───────────────
+// ── Helpers ────────────────────────────────────────────────
 function parseCSVLine(text, separator) {
-    let insideQuote = false;
-    let entries = [];
-    let entry = '';
-    for (let i = 0; i < text.length; i++) {
-        let char = text[i];
-        if (char === '"') {
-            insideQuote = !insideQuote;
-        } else if (char === separator && !insideQuote) {
-            entries.push(entry.trim());
-            entry = '';
-        } else {
-            entry += char;
-        }
+    let insideQuote = false, entries = [], entry = '';
+    for (let char of text) {
+        if (char === '"') insideQuote = !insideQuote;
+        else if (char === separator && !insideQuote) { entries.push(entry.trim()); entry = ''; }
+        else entry += char;
     }
     entries.push(entry.trim());
     return entries;
@@ -858,23 +882,11 @@ function parseAmount(str) {
     if (!str) return 0;
     let clean = str.replace(/[¢$₡\s"']/g, '');
     if (clean.includes(',') && clean.includes('.')) {
-        if (clean.indexOf(',') < clean.indexOf('.')) {
-            clean = clean.replace(/,/g, '');
-        } else {
-            clean = clean.replace(/\./g, '').replace(/,/g, '.');
-        }
+        clean = clean.indexOf(',') < clean.indexOf('.') ? clean.replace(/,/g, '') : clean.replace(/\./g, '').replace(/,/g, '.');
     } else if (clean.includes(',')) {
-        const parts = clean.split(',');
-        if (parts[parts.length - 1].length === 3) {
-            clean = clean.replace(/,/g, '');
-        } else {
-            clean = clean.replace(/,/g, '.');
-        }
+        clean = clean.split(',')[clean.split(',').length - 1].length === 3 ? clean.replace(/,/g, '') : clean.replace(/,/g, '.');
     } else if (clean.includes('.')) {
-        const parts = clean.split('.');
-        if (parts[parts.length - 1].length === 3 && parts.length > 1) {
-            clean = clean.replace(/\./g, '');
-        }
+        if (clean.split('.')[clean.split('.').length - 1].length === 3 && clean.split('.').length > 1) clean = clean.replace(/\./g, '');
     }
     return parseFloat(clean) || 0;
 }
@@ -882,92 +894,46 @@ function parseAmount(str) {
 function parseDate(str) {
     if (!str) return '';
     str = str.trim();
-    let match = str.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/);
+    let match = str.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/) || str.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/);
     if (match) {
-        return `${match[1]}-${match[2].padStart(2, '0')}-${match[3].padStart(2, '0')}`;
-    }
-    match = str.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/);
-    if (match) {
-        return `${match[3]}-${match[2].padStart(2, '0')}-${match[1].padStart(2, '0')}`;
+        return match[3].length === 4 
+            ? `${match[3]}-${match[2].padStart(2, '0')}-${match[1].padStart(2, '0')}`
+            : `${match[1]}-${match[2].padStart(2, '0')}-${match[3].padStart(2, '0')}`;
     }
     return '';
 }
 
-// ── Import ─────────────────────────────────────────────────
+// ── Import / Export ────────────────────────────────────────
 let importType = 'CRC';
 window.openImportModal  = () => { document.getElementById('importModal').style.display='flex'; lucide.createIcons(); };
 window.closeImportModal = () => document.getElementById('importModal').style.display='none';
 window.setImportType = (t) => {
     importType = t;
-    document.getElementById('importBtnCRC').className = t==='CRC'
-        ? 'flex-1 py-2 rounded-lg text-sm border-2 border-brand-blue text-brand-blue font-bold bg-blue-50'
-        : 'flex-1 py-2 rounded-lg text-sm border-2 border-gray-200 text-gray-400 font-bold';
-    document.getElementById('importBtnUSD').className = t==='USD'
-        ? 'flex-1 py-2 rounded-lg text-sm border-2 border-brand-blue text-brand-blue font-bold bg-blue-50'
-        : 'flex-1 py-2 rounded-lg text-sm border-2 border-gray-200 text-gray-400 font-bold';
+    document.getElementById('importBtnCRC').className = t==='CRC' ? 'flex-1 py-2 rounded-lg text-sm border-2 border-brand-blue text-brand-blue font-bold bg-blue-50' : 'flex-1 py-2 rounded-lg text-sm border-2 border-gray-200 text-gray-400 font-bold';
+    document.getElementById('importBtnUSD').className = t==='USD' ? 'flex-1 py-2 rounded-lg text-sm border-2 border-brand-blue text-brand-blue font-bold bg-blue-50' : 'flex-1 py-2 rounded-lg text-sm border-2 border-gray-200 text-gray-400 font-bold';
 };
 window.processImport = () => {
     const raw = document.getElementById('importText').value.trim();
     if (!raw) return showToast('Pega datos primero');
-    
     const isEgresos = activeTab === 'egresos';
-    const list = isEgresos 
-        ? (importType === 'CRC' ? dataCRC : dataUSD)
-        : (importType === 'CRC' ? receivablesCRC : receivablesUSD);
-        
+    const list = isEgresos ? egresos : cobros;
     let count = 0;
     raw.split('\n').forEach(line => {
-        line = line.trim();
-        if (!line) return;
-        
-        let parts = [];
-        if (line.includes('\t')) {
-            parts = line.split('\t').map(p=>p.trim());
-        } else {
-            parts = parseCSVLine(line, ',').map(p=>p.trim());
-        }
-        
+        line = line.trim(); if (!line) return;
+        let parts = line.includes('\t') ? line.split('\t').map(p=>p.trim()) : parseCSVLine(line, ',').map(p=>p.trim());
         if (parts.length < 2) return;
-        
-        let date = '';
-        let concept = '';
-        let amount = 0;
-        
-        let parsedDate = parseDate(parts[0]);
-        if (parsedDate) {
-            date = parsedDate;
-            concept = parts[1] || '';
-            amount = parseAmount(parts[2]);
-        } else {
-            let parsedDate2 = parseDate(parts[1]);
-            if (parsedDate2) {
-                date = parsedDate2;
-                concept = parts[0] || '';
-                amount = parseAmount(parts[2]);
-            } else {
-                date = new Date().toISOString().split('T')[0];
-                concept = parts[0] || '';
-                amount = parseAmount(parts[parts.length - 1]);
-            }
-        }
-        
-        if (isEgresos) {
-            list.push({ id: Date.now() + Math.random(), date, concept, amount, paid: false, selected: false, selected_card: false, card_id: 'ae_luis' });
-        } else {
-            list.push({ id: Date.now() + Math.random(), date, client: concept, amount, tentativeDate: date, observations: '', selected: false });
-        }
+        let parsedDate = parseDate(parts[0]) || parseDate(parts[1]);
+        let date = parsedDate || new Date().toISOString().split('T')[0];
+        let concept = parsedDate ? (parts[1] || '') : parts[0];
+        let amount = parseAmount(parts[parts.length - 1]);
+        if (isEgresos) list.push({ id: Date.now() + Math.random(), date, concept, amount, currency: importType, paid: false, selected: false, selected_card: false, card_id: 'ae_luis' });
+        else list.push({ id: Date.now() + Math.random(), date, client: concept, amount, currency: importType, tentativeDate: date, observations: '', selected: false });
         count++;
     });
-    
-    if (isEgresos) renderTable();
-    else renderReceivablesTable();
-    
-    saveToCloud();
-    closeImportModal();
-    showToast(`${count} movimientos importados ✓`);
+    if (isEgresos) renderTable(); else renderReceivablesTable();
+    saveToCloud(); closeImportModal(); showToast(`${count} movimientos importados ✓`);
 };
 
-// ── Export ─────────────────────────────────────────────────
 window.openExportModal  = () => { document.getElementById('exportModal').style.display='flex'; lucide.createIcons(); };
 window.closeExportModal = () => document.getElementById('exportModal').style.display='none';
 
@@ -976,13 +942,9 @@ async function captureArea() {
     const orig = [];
     tw.forEach(el => { orig.push(el.style.cssText); el.style.overflow='visible'; el.style.height='auto'; el.style.maxHeight='none'; });
     await new Promise(r=>setTimeout(r,400));
-    const area = document.getElementById('export-area');
-    const canvas = await html2canvas(area, {
+    const canvas = await html2canvas(document.getElementById('export-area'), {
         scale: 2, useCORS: true, backgroundColor: '#f0f4f9',
-        width: area.scrollWidth, height: area.scrollHeight,
-        windowWidth: document.body.scrollWidth,
-        scrollX: -window.scrollX, scrollY: -window.scrollY,
-        ignoreElements: el => ['exportModal','importModal','toast'].includes(el.id)
+        ignoreElements: el => ['exportModal','importModal','trashModal','toast'].includes(el.id)
     });
     tw.forEach((el,i) => el.style.cssText = orig[i]);
     return canvas;
@@ -1005,164 +967,163 @@ window.exportPDF = async () => {
     showToast('¡PDF descargado!');
 };
 
-// ── Rows (Egresos) ─────────────────────────────────────────
+// ── Acciones de Filas (Egresos) ───────────────────────────
 window.addRow = (type) => {
-    const list = type==='CRC' ? dataCRC : dataUSD;
-    list.push({ id: Date.now(), date: new Date().toISOString().split('T')[0], concept: 'Nuevo movimiento', amount: 0, paid: false, selected: false, selected_card: false, card_id: 'ae_luis' });
+    egresos.push({ id: Date.now(), date: new Date().toISOString().split('T')[0], concept: 'Nuevo movimiento', amount: 0, currency: type, paid: false, selected: false, selected_card: false, card_id: 'ae_luis' });
     renderTable(); saveToCloud();
 };
-window.removeRow = (type, id) => {
-    if (type==='CRC') dataCRC = dataCRC.filter(i=>i.id!==id);
-    else              dataUSD = dataUSD.filter(i=>i.id!==id);
-    renderTable(); saveToCloud();
+window.removeRow = (id) => {
+    const idx = egresos.findIndex(i=>i.id===id);
+    if (idx !== -1) { moveToTrash(egresos.splice(idx, 1)[0], 'egreso'); renderTable(); saveToCloud(); }
 };
-window.updateItem = (type, id, field, value) => {
-    const list = type==='CRC' ? dataCRC : dataUSD;
-    const item = list.find(i=>i.id===id);
+window.updateItem = (id, field, value) => {
+    const item = egresos.find(i=>i.id===id);
     if (!item) return;
-    if (field==='amount') item.amount = parseFloat(value)||0;
-    else item[field] = value;
-    renderTable();
-    saveToCloud();
+    if (field==='amount') item.amount = parseFloat(value)||0; else item[field] = value;
+    renderTable(); saveToCloud();
 };
-window.changeType = (currentType, id, newType) => {
-    if (currentType === newType) return;
-    const srcList = currentType==='CRC' ? dataCRC : dataUSD;
-    const dstList = newType==='CRC' ? dataCRC : dataUSD;
-    const idx = srcList.findIndex(i=>i.id===id);
-    if (idx === -1) return;
-    const item = srcList.splice(idx, 1)[0];
-    dstList.push(item);
-    renderTable();
-    saveToCloud();
+window.changeType = (id, newType) => {
+    const item = egresos.find(i=>i.id===id);
+    if (!item) return;
+    item.currency = newType; renderTable(); saveToCloud();
 };
-window.toggleSelected = (type, id, checked, trEl) => {
-    const list = type==='CRC' ? dataCRC : dataUSD;
-    const item = list.find(i=>i.id===id);
-    if (item) { item.selected = checked; }
-    trEl.classList.toggle('selected-row', checked);
-    updateCalculations();
-    saveToCloud();
+window.toggleSelected = (id, checked, trEl) => {
+    const item = egresos.find(i=>i.id===id);
+    if (item) item.selected = checked;
+    if (trEl) trEl.classList.toggle('selected-row', checked);
+    updateCalculations(); saveToCloud();
 };
-window.toggleSelectedCard = (type, id, checked, trEl) => {
-    const list = type==='CRC' ? dataCRC : dataUSD;
-    const item = list.find(i=>i.id===id);
-    if (item) { 
-        item.selected_card = checked; 
-        if (checked && !item.card_id) {
-            item.card_id = creditCards.length > 0 ? creditCards[0].id : 'ae_luis';
-        }
-    }
-    renderTable();
-    saveToCloud();
+window.toggleSelectedCard = (id, checked, trEl) => {
+    const item = egresos.find(i=>i.id===id);
+    if (item) { item.selected_card = checked; if (checked && !item.card_id) item.card_id = creditCards.length > 0 ? creditCards[0].id : 'ae_luis'; }
+    renderTable(); saveToCloud();
 };
-window.updateItemCard = (type, id, cardId) => {
-    const list = type==='CRC' ? dataCRC : dataUSD;
-    const item = list.find(i=>i.id===id);
-    if (item) { item.card_id = cardId; }
-    updateCalculations();
-    renderCards();
-    saveToCloud();
+window.updateItemCard = (id, cardId) => {
+    const item = egresos.find(i=>i.id===id);
+    if (item) item.card_id = cardId;
+    updateCalculations(); renderCards(); saveToCloud();
 };
 
-// ── Rows (Cuentas por Cobrar) ────────────────────────────────
+// ── Acciones de Filas (Cobros) ────────────────────────────
 window.addReceivableRow = (type) => {
-    const list = type==='CRC' ? receivablesCRC : receivablesUSD;
-    list.push({ 
-        id: Date.now(), 
-        date: new Date().toISOString().split('T')[0], 
-        client: 'Nuevo Cliente', 
-        amount: 0, 
-        tentativeDate: new Date().toISOString().split('T')[0], 
-        observations: '', 
-        selected: false 
-    });
+    cobros.push({ id: Date.now(), date: new Date().toISOString().split('T')[0], client: 'Nuevo Cliente', amount: 0, currency: type, tentativeDate: new Date().toISOString().split('T')[0], observations: '', selected: false });
     renderReceivablesTable(); saveToCloud();
 };
-window.removeReceivableRow = (type, id) => {
-    if (type==='CRC') receivablesCRC = receivablesCRC.filter(i=>i.id!==id);
-    else              receivablesUSD = receivablesUSD.filter(i=>i.id!==id);
-    renderReceivablesTable(); saveToCloud();
+window.removeReceivableRow = (id) => {
+    const idx = cobros.findIndex(i=>i.id===id);
+    if (idx !== -1) { moveToTrash(cobros.splice(idx, 1)[0], 'cobro'); renderReceivablesTable(); saveToCloud(); }
 };
-window.updateReceivableItem = (type, id, field, value) => {
-    const list = type==='CRC' ? receivablesCRC : receivablesUSD;
-    const item = list.find(i=>i.id===id);
+window.updateReceivableItem = (id, field, value) => {
+    const item = cobros.find(i=>i.id===id);
     if (!item) return;
-    if (field==='amount') item.amount = parseFloat(value)||0;
-    else item[field] = value;
-    renderReceivablesTable();
-    saveToCloud();
+    if (field==='amount') item.amount = parseFloat(value)||0; else item[field] = value;
+    renderReceivablesTable(); saveToCloud();
 };
-window.changeReceivableType = (currentType, id, newType) => {
-    if (currentType === newType) return;
-    const srcList = currentType==='CRC' ? receivablesCRC : receivablesUSD;
-    const dstList = newType==='CRC' ? receivablesCRC : receivablesUSD;
-    const idx = srcList.findIndex(i=>i.id===id);
-    if (idx === -1) return;
-    const item = srcList.splice(idx, 1)[0];
-    dstList.push(item);
-    renderReceivablesTable();
-    saveToCloud();
+window.changeReceivableType = (id, newType) => {
+    const item = cobros.find(i=>i.id===id);
+    if (!item) return;
+    item.currency = newType; renderReceivablesTable(); saveToCloud();
 };
-window.toggleReceivableSelected = (type, id, checked, trEl) => {
-    const list = type==='CRC' ? receivablesCRC : receivablesUSD;
-    const item = list.find(i=>i.id===id);
-    if (item) { item.selected = checked; }
-    trEl.classList.toggle('selected-row', checked);
-    updateCalculations();
-    saveToCloud();
+window.toggleReceivableSelected = (id, checked, trEl) => {
+    const item = cobros.find(i=>i.id===id);
+    if (item) item.selected = checked;
+    if (trEl) trEl.classList.toggle('selected-row', checked);
+    updateCalculations(); saveToCloud();
 };
 
-// ── Cards (Edición y Control de Tarjetas) ─────────────────────
+// ── Tarjetas de Crédito ──────────────────────────────────
 window.updateCard = (idx, field, value) => {
-    if (field === 'available' || field === 'limit') {
-        creditCards[idx][field] = parseFloat(value) || 0;
-    } else {
-        creditCards[idx][field] = value;
-    }
-    renderCards();
-    updateCalculations();
-    saveToCloud();
+    creditCards[idx][field] = (field === 'available' || field === 'limit') ? (parseFloat(value) || 0) : value;
+    renderCards(); updateCalculations(); saveToCloud();
 };
 window.addCard = () => {
-    const newId = 'card_' + Date.now();
-    creditCards.push({
-        id: newId,
-        name: 'Nueva Tarjeta',
-        limit: 1000.00,
-        available: 1000.00
-    });
-    renderCards();
-    renderTable(); // Para incluir la tarjeta en los selectores
-    saveToCloud();
-    showToast('Nueva tarjeta añadida');
+    creditCards.push({ id: 'card_' + Date.now(), name: 'Nueva Tarjeta', limit: 1000.00, available: 1000.00, group: 'otro' });
+    renderCards(); renderTable(); saveToCloud(); showToast('Nueva tarjeta añadida');
 };
 window.removeCard = (idx) => {
-    if (confirm(`¿Está seguro de que desea eliminar la tarjeta "${creditCards[idx].name}"?`)) {
-        creditCards.splice(idx, 1);
-        renderCards();
-        renderTable(); // Re-render para quitar la tarjeta de los dropdowns
-        saveToCloud();
-        showToast('Tarjeta eliminada');
+    if (confirm(`¿Eliminar la tarjeta "${creditCards[idx].name}"?`)) {
+        creditCards.splice(idx, 1); renderCards(); renderTable(); saveToCloud();
+    }
+};
+
+// ── Búsqueda Rápida ─────────────────────────────────────────
+window.onSearchInput = () => {
+    searchQuery = document.getElementById('quickSearch').value.toLowerCase().trim();
+    document.getElementById('clearSearchBtn').classList.toggle('hidden', !searchQuery);
+    if (activeTab === 'egresos') renderTable(); else if (activeTab === 'cobrar') renderReceivablesTable();
+};
+window.clearSearch = () => {
+    document.getElementById('quickSearch').value = ''; searchQuery = '';
+    document.getElementById('clearSearchBtn').classList.add('hidden');
+    if (activeTab === 'egresos') renderTable(); else if (activeTab === 'cobrar') renderReceivablesTable();
+};
+
+// ── Papelera de Reciclaje ──────────────────────────────────
+window.openTrashModal = () => { document.getElementById('trashModal').style.display = 'flex'; renderTrashTable(); };
+window.closeTrashModal = () => document.getElementById('trashModal').style.display = 'none';
+window.moveToTrash = (item, type) => { trash.push({ ...item, deletedAt: new Date().toISOString(), originalType: type }); updateTrashBadge(); };
+window.updateTrashBadge = () => {
+    const badge = document.getElementById('trashCountBadge');
+    if (badge) { badge.textContent = trash.length; badge.classList.toggle('hidden', trash.length === 0); }
+};
+window.renderTrashTable = () => {
+    const tbody = document.getElementById('trashTableBody');
+    tbody.innerHTML = '';
+    document.getElementById('trashEmptyState').style.display = trash.length === 0 ? 'block' : 'none';
+    document.getElementById('emptyTrashBtn').style.display = trash.length > 0 ? 'flex' : 'none';
+    trash.forEach((item) => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-gray-50';
+        const isEgreso = item.originalType === 'egreso';
+        tr.innerHTML = `<td class="px-4 py-2"><span class="bg-${isEgreso?'blue':'green'}-50 text-${isEgreso?'blue':'green'}-700 font-extrabold text-[9px] px-2 py-0.5 rounded-full uppercase">${isEgreso?'Egreso':'Cobro'}</span></td>
+            <td class="px-4 py-2 font-medium">${escHtml(isEgreso ? item.concept : item.client)}<div class="text-[9px] text-gray-400">Eliminado: ${new Date(item.deletedAt).toLocaleDateString()}</div></td>
+            <td class="px-4 py-2 text-right font-semibold">${fmt(item.amount, item.currency==='CRC'?'₡':'$')}</td>
+            <td class="px-4 py-2 text-center">
+                <div class="flex justify-center gap-1.5">
+                    <button onclick="restoreItem(${item.id})" class="p-1 hover:text-brand-blue"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i></button>
+                    <button onclick="deletePermanent(${item.id})" class="p-1 hover:text-red-500"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                </div>
+            </td>`;
+        tbody.appendChild(tr);
+    });
+    lucide.createIcons();
+};
+window.restoreItem = (id) => {
+    const idx = trash.findIndex(i => i.id === id);
+    if (idx !== -1) {
+        const item = trash.splice(idx, 1)[0];
+        const origType = item.originalType;
+        delete item.deletedAt; delete item.originalType;
+        if (origType === 'egreso') { egresos.push(item); renderTable(); } else { cobros.push(item); renderReceivablesTable(); }
+        saveToCloud(); renderTrashTable(); updateTrashBadge(); showToast('Restaurado');
+    }
+};
+window.deletePermanent = (id) => {
+    if (confirm('¿Eliminar permanentemente?')) {
+        trash = trash.filter(i => i.id !== id); saveToCloud(); renderTrashTable(); updateTrashBadge();
+    }
+};
+window.emptyTrash = () => {
+    if (confirm('¿Vaciar papelera?')) {
+        trash = []; saveToCloud(); renderTrashTable(); updateTrashBadge();
     }
 };
 
 // ── Drag & Drop ───────────────────────────────────────────
-window.handleDragStart = (e, type, idx) => { draggedItem=idx; dragSrcType=type; e.currentTarget.classList.add('dragging'); };
+window.handleDragStart = (e, id) => { draggedId=id; e.currentTarget.classList.add('dragging'); };
 window.handleDragEnd   = (e) => { e.currentTarget.classList.remove('dragging'); document.querySelectorAll('tr').forEach(r=>r.classList.remove('drag-over')); };
-window.handleDrop = (e, type, idx) => {
+window.handleDrop = (e, targetId) => {
     e.preventDefault(); 
-    if(type!==dragSrcType) return;
+    if (draggedId === targetId) return;
     const isEgresos = activeTab === 'egresos';
-    const list = isEgresos 
-        ? (type==='CRC' ? dataCRC : dataUSD)
-        : (type==='CRC' ? receivablesCRC : receivablesUSD);
-        
-    const item = list.splice(draggedItem,1)[0]; 
-    list.splice(idx,0,item);
+    const list = isEgresos ? egresos : cobros;
+    const srcIdx = list.findIndex(i => i.id === draggedId);
+    const dstIdx = list.findIndex(i => i.id === targetId);
+    if (srcIdx === -1 || dstIdx === -1) return;
     
-    if (isEgresos) renderTable();
-    else renderReceivablesTable();
+    if (isEgresos) egresosSort = { col: null, dir: 'asc' }; else cobrarSort = { col: null, dir: 'asc' };
+    list.splice(dstIdx, 0, list.splice(srcIdx, 1)[0]);
+    if (isEgresos) renderTable(); else renderReceivablesTable();
     saveToCloud();
 };
 
@@ -1170,171 +1131,132 @@ window.handleDrop = (e, type, idx) => {
 function renderTable() {
     const tbody = document.getElementById('tableUnified');
     tbody.innerHTML = '';
-    const exRate  = parseFloat(document.getElementById('exchangeRate').value) || 1;
-    const initCRC = parseFloat(document.getElementById('initCRC').value) || 0;
-    const initUSD = parseFloat(document.getElementById('initUSD').value) || 0;
-
-    let runningUSD = initUSD + (initCRC / exRate);
-
-    const crcRows = dataCRC.map((item, idx) => {
-        if (!item.selected_card) {
-            runningUSD -= (item.amount / exRate);
-        }
-        return {...item, _type:'CRC', _idx:idx, _bal:runningUSD};
-    });
-    const usdRows = dataUSD.map((item, idx) => {
-        if (!item.selected_card) {
-            runningUSD -= item.amount;
-        }
-        return {...item, _type:'USD', _idx:idx, _bal:runningUSD};
-    });
-    let rows = [...crcRows, ...usdRows];
-    if (typeof egresosSort !== 'undefined' && egresosSort.col === 'currency' && egresosSort.dir === 'desc') {
-        rows = [...usdRows, ...crcRows];
+    const exRate = parseFloat(document.getElementById('exchangeRate').value) || 1;
+    let runningUSD = (parseFloat(document.getElementById('initUSD').value) || 0) + ((parseFloat(document.getElementById('initCRC').value) || 0) / exRate);
+    
+    let displayRows = [...egresos];
+    if (egresosSort.col) {
+        displayRows.sort((a, b) => {
+            let valA = egresosSort.col === 'amount' ? (a.currency === 'CRC' ? a.amount / exRate : a.amount) : a[egresosSort.col];
+            let valB = egresosSort.col === 'amount' ? (b.currency === 'CRC' ? b.amount / exRate : b.amount) : b[egresosSort.col];
+            if (egresosSort.col === 'concept') { valA = (valA||'').toLowerCase(); valB = (valB||'').toLowerCase(); }
+            return egresosSort.dir === 'asc' ? (valA > valB ? 1 : -1) : (valA < valB ? 1 : -1);
+        });
     }
-
-    rows.forEach(item => {
-        const isCRC = item._type === 'CRC';
+    
+    displayRows = displayRows.map(item => {
+        if (!item.selected_card) runningUSD -= (item.currency === 'CRC' ? item.amount / exRate : item.amount);
+        return { ...item, _bal: runningUSD };
+    });
+    
+    if (searchQuery) {
+        displayRows = displayRows.filter(i => (i.concept||'').toLowerCase().includes(searchQuery) || (i.amount||0).toString().includes(searchQuery) || (i.date||'').includes(searchQuery));
+    }
+    
+    displayRows.forEach(item => {
+        const isCRC = item.currency === 'CRC';
         const sym = isCRC ? '₡' : '$';
         const tr = document.createElement('tr');
         tr.className = `border-b transition-colors ${item.selected ? 'selected-row' : ''} ${item.selected_card ? 'selected-card-row' : ''}`;
         tr.draggable = true;
-        tr.ondragstart = e => handleDragStart(e, item._type, item._idx);
-        tr.ondragend   = e => handleDragEnd(e);
-        tr.ondragover  = e => { e.preventDefault(); tr.classList.add('drag-over'); };
+        tr.ondragstart = e => handleDragStart(e, item.id);
+        tr.ondragend = e => handleDragEnd(e);
+        tr.ondragover = e => { e.preventDefault(); tr.classList.add('drag-over'); };
         tr.ondragleave = () => tr.classList.remove('drag-over');
-        tr.ondrop      = e => handleDrop(e, item._type, item._idx);
-
-        // Conversión bidireccional exacta para Egresos
-        const equivCellContent = isCRC
-            ? `≈ ${fmt(item.amount / exRate, '$')}`
-            : `≈ ${fmt(item.amount * exRate, '₡')}`;
-
-        const equivCell = `<td class="text-right hide-mobile" style="white-space:nowrap;color:#5f6368;font-size:11px">${equivCellContent}</td>`;
-
-        const cardCellContent = `
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-1.5">
-                <input type="checkbox" ${item.selected_card?'checked':''} onchange="toggleSelectedCard('${item._type}',${item.id},this.checked,this.closest('tr'))"
-                    class="w-4 h-4 rounded accent-emerald-600 cursor-pointer">
-                ${item.selected_card ? `
-                    <select onchange="updateItemCard('${item._type}',${item.id},this.value)" class="text-[10px] font-bold bg-white border border-gray-300 rounded px-1.5 py-0.5 focus:outline-none max-w-[100px] truncate cursor-pointer">
-                        ${creditCards.length > 0 ? creditCards.map(c => `<option value="${c.id}" ${item.card_id===c.id?'selected':''}>${c.name}</option>`).join('') : '<option value="">No hay tarjetas</option>'}
-                    </select>
-                ` : ''}
-            </div>
-        `;
-
+        tr.ondrop = e => handleDrop(e, item.id);
+        
         tr.innerHTML = `
             <td class="drag-handle px-2 py-3"><i data-lucide="grip-vertical" class="w-3.5 h-3.5"></i></td>
             <td class="px-2">
-                <select onchange="changeType('${item._type}',${item.id},this.value)"
-                    class="text-xs font-bold border border-gray-200 outline-none cursor-pointer rounded-full px-2 py-0.5 ${isCRC?'bg-green-50 text-green-700 border-green-200':'bg-blue-50 text-blue-700 border-blue-200'}">
+                <select onchange="changeType(${item.id},this.value)" class="text-xs font-bold border rounded-full px-2 py-0.5 ${isCRC?'bg-green-50 text-green-700 border-green-200':'bg-blue-50 text-blue-700 border-blue-200'}">
                     <option value="CRC" ${isCRC?'selected':''}>CRC</option>
                     <option value="USD" ${!isCRC?'selected':''}>USD</option>
                 </select>
             </td>
-            <td><input type="date" value="${item.date}" onchange="updateItem('${item._type}',${item.id},'date',this.value)" class="cell-input text-xs" style="min-width:108px"></td>
-            <td><input type="text" value="${escHtml(item.concept)}" onchange="updateItem('${item._type}',${item.id},'concept',this.value)" class="cell-input" style="min-width:140px"></td>
+            <td><input type="date" value="${item.date}" onchange="updateItem(${item.id},'date',this.value)" class="cell-input text-xs" style="min-width:108px"></td>
+            <td><input type="text" value="${escHtml(item.concept)}" onchange="updateItem(${item.id},'concept',this.value)" class="cell-input" style="min-width:140px"></td>
             <td class="text-right">
                 <div class="flex items-center justify-end gap-0.5">
                     <span class="text-gray-400 text-xs">${sym}</span>
-                    <input type="number" value="${item.amount}" onchange="updateItem('${item._type}',${item.id},'amount',this.value)" class="cell-input amount-input font-semibold">
+                    <input type="number" value="${item.amount}" onchange="updateItem(${item.id},'amount',this.value)" class="cell-input amount-input font-semibold font-mono">
                 </div>
             </td>
-            ${equivCell}
+            <td class="text-right hide-mobile text-xs text-gray-500 font-mono">${isCRC ? '≈ '+fmt(item.amount/exRate,'$') : '≈ '+fmt(item.amount*exRate,'₡')}</td>
+            <td class="text-center"><input type="checkbox" ${item.selected?'checked':''} onchange="toggleSelected(${item.id},this.checked,this.closest('tr'))" class="w-4 h-4 cursor-pointer"></td>
             <td class="text-center">
-                <input type="checkbox" ${item.selected?'checked':''} onchange="toggleSelected('${item._type}',${item.id},this.checked,this.closest('tr'))"
-                    class="w-4 h-4 rounded accent-blue-600 cursor-pointer">
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-1.5">
+                    <input type="checkbox" ${item.selected_card?'checked':''} onchange="toggleSelectedCard(${item.id},this.checked,this.closest('tr'))" class="w-4 h-4 cursor-pointer">
+                    ${item.selected_card ? `
+                        <select onchange="updateItemCard(${item.id},this.value)" class="text-[10px] bg-white border rounded px-1.5 py-0.5 focus:outline-none max-w-[100px] truncate cursor-pointer font-bold">
+                            ${creditCards.map(c => `<option value="${c.id}" ${item.card_id===c.id?'selected':''}>${c.name}</option>`).join('')}
+                        </select>
+                    ` : ''}
+                </div>
             </td>
-            <td class="text-center">
-                ${cardCellContent}
-            </td>
-            <td class="text-right text-xs font-bold ${item._bal<0?'bal-neg':'bal-pos'}" style="white-space:nowrap">${fmt(item._bal,'$')}</td>
-            <td class="px-2">
-                <button onclick="removeRow('${item._type}',${item.id})" class="text-gray-300 hover:text-red-500 p-1 rounded transition-colors">
-                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                </button>
-            </td>
+            <td class="text-right text-xs font-bold font-mono ${item._bal<0?'bal-neg':'bal-pos'}">${fmt(item._bal,'$')}</td>
+            <td class="px-2"><button onclick="removeRow(${item.id})" class="text-gray-300 hover:text-red-500 transition-colors"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button></td>
         `;
         tbody.appendChild(tr);
     });
-
-    updateCalculations();
-    lucide.createIcons();
-    if (typeof updateSortIcons === 'function') {
-        updateSortIcons();
-    }
+    updateCalculations(); lucide.createIcons();
 }
 
 function renderReceivablesTable() {
     const tbody = document.getElementById('tableReceivables');
     tbody.innerHTML = '';
-    const exRate  = parseFloat(document.getElementById('exchangeRate').value) || 1;
-
-    const crcRows = receivablesCRC.map((item, idx) => ({...item, _type:'CRC', _idx:idx}));
-    const usdRows = receivablesUSD.map((item, idx) => ({...item, _type:'USD', _idx:idx}));
-    let rows = [...crcRows, ...usdRows];
-    if (typeof cobrarSort !== 'undefined' && cobrarSort.col === 'currency' && cobrarSort.dir === 'desc') {
-        rows = [...usdRows, ...crcRows];
+    const exRate = parseFloat(document.getElementById('exchangeRate').value) || 1;
+    
+    let displayRows = [...cobros];
+    if (cobrarSort.col) {
+        displayRows.sort((a, b) => {
+            let valA = cobrarSort.col === 'amount' ? (a.currency === 'CRC' ? a.amount / exRate : a.amount) : a[cobrarSort.col];
+            let valB = cobrarSort.col === 'amount' ? (b.currency === 'CRC' ? b.amount / exRate : b.amount) : b[cobrarSort.col];
+            if (cobrarSort.col === 'client' || cobrarSort.col === 'observations') { valA = (valA||'').toLowerCase(); valB = (valB||'').toLowerCase(); }
+            return cobrarSort.dir === 'asc' ? (valA > valB ? 1 : -1) : (valA < valB ? 1 : -1);
+        });
     }
-
-    rows.forEach(item => {
-        const isCRC = item._type === 'CRC';
+    
+    if (searchQuery) {
+        displayRows = displayRows.filter(i => (i.client||'').toLowerCase().includes(searchQuery) || (i.observations||'').toLowerCase().includes(searchQuery) || (i.amount||0).toString().includes(searchQuery) || (i.date||'').includes(searchQuery));
+    }
+    
+    displayRows.forEach(item => {
+        const isCRC = item.currency === 'CRC';
         const sym = isCRC ? '₡' : '$';
         const tr = document.createElement('tr');
         tr.className = `border-b transition-colors ${item.selected ? 'selected-row' : ''}`;
         tr.draggable = true;
-        tr.ondragstart = e => handleDragStart(e, item._type, item._idx);
-        tr.ondragend   = e => handleDragEnd(e);
-        tr.ondragover  = e => { e.preventDefault(); tr.classList.add('drag-over'); };
+        tr.ondragstart = e => handleDragStart(e, item.id);
+        tr.ondragend = e => handleDragEnd(e);
+        tr.ondragover = e => { e.preventDefault(); tr.classList.add('drag-over'); };
         tr.ondragleave = () => tr.classList.remove('drag-over');
-        tr.ondrop      = e => handleDrop(e, item._type, item._idx);
-
-        // Conversión bidireccional exacta para Ingresos/Cobros
-        const equivCellContent = isCRC
-            ? `≈ ${fmt(item.amount / exRate, '$')}`
-            : `≈ ${fmt(item.amount * exRate, '₡')}`;
-
-        const equivCell = `<td class="text-right hide-mobile" style="white-space:nowrap;color:#5f6368;font-size:11px">${equivCellContent}</td>`;
-
+        tr.ondrop = e => handleDrop(e, item.id);
+        
         tr.innerHTML = `
             <td class="drag-handle px-2 py-3"><i data-lucide="grip-vertical" class="w-3.5 h-3.5"></i></td>
             <td class="px-2">
-                <select onchange="changeReceivableType('${item._type}',${item.id},this.value)"
-                    class="text-xs font-bold border border-gray-200 outline-none cursor-pointer rounded-full px-2 py-0.5 ${isCRC?'bg-green-50 text-green-700 border-green-200':'bg-blue-50 text-blue-700 border-blue-200'}">
+                <select onchange="changeReceivableType(${item.id},this.value)" class="text-xs font-bold border rounded-full px-2 py-0.5 ${isCRC?'bg-green-50 text-green-700 border-green-200':'bg-blue-50 text-blue-700 border-blue-200'}">
                     <option value="CRC" ${isCRC?'selected':''}>CRC</option>
                     <option value="USD" ${!isCRC?'selected':''}>USD</option>
                 </select>
             </td>
-            <td><input type="date" value="${item.date}" onchange="updateReceivableItem('${item._type}',${item.id},'date',this.value)" class="cell-input text-xs" style="min-width:108px"></td>
-            <td><input type="text" value="${escHtml(item.client)}" onchange="updateReceivableItem('${item._type}',${item.id},'client',this.value)" class="cell-input" style="min-width:140px"></td>
+            <td><input type="date" value="${item.date}" onchange="updateReceivableItem(${item.id},'date',this.value)" class="cell-input text-xs" style="min-width:108px"></td>
+            <td><input type="text" value="${escHtml(item.client)}" onchange="updateReceivableItem(${item.id},'client',this.value)" class="cell-input" style="min-width:140px"></td>
             <td class="text-right">
                 <div class="flex items-center justify-end gap-0.5">
                     <span class="text-gray-400 text-xs">${sym}</span>
-                    <input type="number" value="${item.amount}" onchange="updateReceivableItem('${item._type}',${item.id},'amount',this.value)" class="cell-input amount-input font-semibold">
+                    <input type="number" value="${item.amount}" onchange="updateReceivableItem(${item.id},'amount',this.value)" class="cell-input amount-input font-semibold font-mono">
                 </div>
             </td>
-            ${equivCell}
-            <td><input type="date" value="${item.tentativeDate}" onchange="updateReceivableItem('${item._type}',${item.id},'tentativeDate',this.value)" class="cell-input text-xs" style="min-width:108px"></td>
-            <td><input type="text" value="${escHtml(item.observations)}" onchange="updateReceivableItem('${item._type}',${item.id},'observations',this.value)" class="cell-input" style="min-width:140px"></td>
-            <td class="text-center">
-                <input type="checkbox" ${item.selected?'checked':''} onchange="toggleReceivableSelected('${item._type}',${item.id},this.checked,this.closest('tr'))"
-                    class="w-4 h-4 rounded accent-green-600 cursor-pointer">
-            </td>
-            <td class="px-2">
-                <button onclick="removeReceivableRow('${item._type}',${item.id})" class="text-gray-300 hover:text-red-500 p-1 rounded transition-colors">
-                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                </button>
-            </td>
+            <td class="text-right hide-mobile text-xs text-gray-500 font-mono">${isCRC ? '≈ '+fmt(item.amount/exRate,'$') : '≈ '+fmt(item.amount*exRate,'₡')}</td>
+            <td><input type="date" value="${item.tentativeDate}" onchange="updateReceivableItem(${item.id},'tentativeDate',this.value)" class="cell-input text-xs" style="min-width:108px"></td>
+            <td><input type="text" value="${escHtml(item.observations)}" onchange="updateReceivableItem(${item.id},'observations',this.value)" class="cell-input" style="min-width:140px"></td>
+            <td class="text-center"><input type="checkbox" ${item.selected?'checked':''} onchange="toggleReceivableSelected(${item.id},this.checked,this.closest('tr'))" class="w-4 h-4 cursor-pointer"></td>
+            <td class="px-2"><button onclick="removeReceivableRow(${item.id})" class="text-gray-300 hover:text-red-500 transition-colors"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button></td>
         `;
         tbody.appendChild(tr);
     });
-
-    updateCalculations();
-    lucide.createIcons();
-    if (typeof updateSortIcons === 'function') {
-        updateSortIcons();
-    }
+    updateCalculations(); lucide.createIcons();
 }
 
 function renderCards() {
@@ -1344,242 +1266,84 @@ function renderCards() {
     const newGrid  = document.getElementById('newCardsGrid');
     const newSect  = document.getElementById('newCardsSection');
     
-    compGrid.innerHTML = '';
-    luisGrid.innerHTML = '';
-    khayGrid.innerHTML = '';
-    newGrid.innerHTML = '';
+    compGrid.innerHTML = ''; luisGrid.innerHTML = ''; khayGrid.innerHTML = ''; newGrid.innerHTML = '';
     newSect.style.display = 'none';
-    
     const exRate = parseFloat(document.getElementById('exchangeRate').value) || 1;
 
     creditCards.forEach((card, idx) => {
-        // Calcular cargos de esta tarjeta
-        const crcCharges = dataCRC
-            .filter(i => i.selected_card && i.card_id === card.id)
-            .reduce((sum, i) => sum + (i.amount / exRate), 0);
-            
-        const usdCharges = dataUSD
-            .filter(i => i.selected_card && i.card_id === card.id)
-            .reduce((sum, i) => sum + i.amount, 0);
-            
+        const crcCharges = egresos.filter(i => i.selected_card && i.card_id === card.id && i.currency === 'CRC').reduce((sum, i) => sum + (i.amount / exRate), 0);
+        const usdCharges = egresos.filter(i => i.selected_card && i.card_id === card.id && i.currency === 'USD').reduce((sum, i) => sum + i.amount, 0);
         const charges = crcCharges + usdCharges;
         const projected = card.available - charges;
-        
         const usedAmount = card.limit - projected;
         const pctUsed = Math.min(100, Math.max(0, (usedAmount / card.limit) * 100)) || 0;
-
         const isLow = projected < (card.limit * 0.15);
 
         const cardEl = document.createElement('div');
-        cardEl.className = "bg-white rounded-2xl p-4 shadow-sm border border-gray-200 relative overflow-hidden flex flex-col justify-between h-56 transition-all hover:shadow-md hover:border-gray-300";
-        
-        // Cabecera superior de acento dependiendo del grupo
-        let stripeColor = 'bg-brand-blue';
-        if (card.group === 'khay') stripeColor = 'bg-brand-green';
-        if (card.group === 'otro') stripeColor = 'bg-brand-cyan';
+        cardEl.className = "bg-white rounded-2xl p-4 shadow-sm border border-gray-200 relative overflow-hidden flex flex-col justify-between h-56 transition-all hover:shadow-md";
+        let stripeColor = card.group === 'khay' ? 'bg-brand-green' : (card.group === 'otro' ? 'bg-brand-cyan' : 'bg-brand-blue');
 
         cardEl.innerHTML = `
             <div class="absolute top-0 left-0 right-0 h-1.5 ${stripeColor}"></div>
-            <!-- Header -->
             <div class="flex justify-between items-start mt-1">
-                <div class="w-8 h-6 bg-amber-500/10 rounded border border-amber-500/20 flex items-center justify-center">
-                    <i data-lucide="cpu" class="w-4 h-4 text-amber-600"></i>
-                </div>
+                <div class="w-8 h-6 bg-amber-500/10 rounded border border-amber-500/20 flex items-center justify-center"><i data-lucide="cpu" class="w-4 h-4 text-amber-600"></i></div>
                 <img src="logo-aire-acondicionado-eco-ingenieria-energia-solar.png" alt="Eco" class="h-4 object-contain">
             </div>
-            
-            <!-- Nombre de Tarjeta Editable -->
             <div class="mt-2">
                 <div class="flex justify-between items-center gap-1">
-                    <input type="text" value="${escHtml(card.name)}" 
-                        onchange="updateCard(${idx}, 'name', this.value)" 
-                        class="bg-transparent border-b border-transparent hover:border-gray-200 focus:border-brand-blue focus:bg-gray-50 outline-none w-full font-bold text-gray-800 text-sm px-1 py-0.5 rounded transition-all"
-                        placeholder="Nombre de la tarjeta">
-                    
-                    <select onchange="updateCard(${idx}, 'group', this.value)" 
-                        class="text-[9px] font-extrabold bg-gray-50 border border-gray-200 rounded px-1 py-0.5 focus:outline-none cursor-pointer text-gray-500 uppercase tracking-wider">
+                    <input type="text" value="${escHtml(card.name)}" onchange="updateCard(${idx}, 'name', this.value)" class="bg-transparent border-none outline-none font-bold text-gray-800 text-sm w-full px-1 rounded hover:bg-gray-50">
+                    <select onchange="updateCard(${idx}, 'group', this.value)" class="text-[9px] font-extrabold bg-gray-50 border rounded px-1 cursor-pointer font-bold">
                         <option value="empresa" ${card.group==='empresa'?'selected':''}>Empresa</option>
                         <option value="luis" ${card.group==='luis'?'selected':''}>Luis</option>
                         <option value="khay" ${card.group==='khay'?'selected':''}>Khay</option>
                         <option value="otro" ${card.group==='otro'?'selected':''}>Nuevo</option>
                     </select>
                 </div>
-                <div class="text-[8px] text-gray-400 uppercase tracking-widest font-semibold mt-0.5 px-1">Límite y Disp. (USD)</div>
             </div>
-            
-            <!-- Controles Disponibles -->
             <div class="grid grid-cols-2 gap-1.5 mt-2 text-[10px]">
-                <div>
-                    <span class="block text-[8px] text-gray-400 uppercase font-semibold px-1">Disponible</span>
-                    <div class="flex items-center bg-gray-50 rounded px-1.5 py-1 mt-0.5 border border-gray-200 focus-within:border-brand-blue transition-all">
-                        <span class="text-gray-500 mr-0.5">$</span>
-                        <input type="number" step="0.01" value="${card.available}" 
-                            onchange="updateCard(${idx}, 'available', this.value)" 
-                            class="bg-transparent border-none outline-none w-full font-bold text-gray-700 text-xs">
-                    </div>
-                </div>
-                <div>
-                    <span class="block text-[8px] text-gray-400 uppercase font-semibold px-1">Límite</span>
-                    <div class="flex items-center bg-gray-50 rounded px-1.5 py-1 mt-0.5 border border-gray-200 focus-within:border-brand-blue transition-all">
-                        <span class="text-gray-500 mr-0.5">$</span>
-                        <input type="number" step="0.01" value="${card.limit}" 
-                            onchange="updateCard(${idx}, 'limit', this.value)" 
-                            class="bg-transparent border-none outline-none w-full font-bold text-gray-700 text-xs">
-                    </div>
-                </div>
+                <div><span class="block text-[8px] text-gray-400 font-semibold px-1">Disponible</span>
+                    <input type="number" step="0.01" value="${card.available}" onchange="updateCard(${idx}, 'available', this.value)" class="bg-gray-50 border border-gray-250 rounded p-1 w-full font-bold"></div>
+                <div><span class="block text-[8px] text-gray-400 font-semibold px-1">Límite</span>
+                    <input type="number" step="0.01" value="${card.limit}" onchange="updateCard(${idx}, 'limit', this.value)" class="bg-gray-50 border border-gray-250 rounded p-1 w-full font-bold"></div>
             </div>
-            
-            <!-- Barra de Progreso -->
-            <div class="mt-3">
-                <div class="w-full bg-gray-100 rounded-full h-1.5">
-                    <div class="h-1.5 rounded-full transition-all ${isLow ? 'bg-red-500' : 'bg-brand-green'}" style="width: ${pctUsed}%"></div>
-                </div>
-            </div>
-
-            <!-- Footer con saldos reales y botón de eliminar -->
-            <div class="mt-2 pt-2 border-t border-gray-100 flex justify-between items-center text-[9px] text-gray-500">
-                <div class="flex items-center gap-1.5">
-                    <span>Proy:</span>
-                    <span class="font-extrabold ${isLow?'text-red-500':'text-brand-green'}">$${projected.toFixed(2)}</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <span class="font-semibold">${pctUsed.toFixed(0)}% uso</span>
-                    <button onclick="removeCard(${idx})" class="text-gray-400 hover:text-red-500 transition-colors p-0.5 rounded" title="Eliminar tarjeta">
-                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                    </button>
-                </div>
-            </div>
-        `;
+            <div class="mt-3"><div class="w-full bg-gray-100 rounded-full h-1.5"><div class="h-1.5 rounded-full ${isLow ? 'bg-red-500' : 'bg-brand-green'}" style="width: ${pctUsed}%"></div></div></div>
+            <div class="mt-2 pt-2 border-t flex justify-between items-center text-[9px] text-gray-500">
+                <div><span>Proy:</span> <span class="font-extrabold ${isLow?'text-red-500':'text-brand-green'}">$${projected.toFixed(2)}</span></div>
+                <div class="flex items-center gap-2"><span>${pctUsed.toFixed(0)}% uso</span><button onclick="removeCard(${idx})" class="text-gray-400 hover:text-red-500"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button></div>
+            </div>`;
         
-        // Agrupar en la grilla correspondiente
-        if (card.group === 'empresa') {
-            compGrid.appendChild(cardEl);
-        } else if (card.group === 'luis') {
-            luisGrid.appendChild(cardEl);
-        } else if (card.group === 'khay') {
-            khayGrid.appendChild(cardEl);
-        } else {
-            newGrid.appendChild(cardEl);
-            newSect.style.display = 'block';
-        }
+        if (card.group === 'empresa') compGrid.appendChild(cardEl);
+        else if (card.group === 'luis') luisGrid.appendChild(cardEl);
+        else if (card.group === 'khay') khayGrid.appendChild(cardEl);
+        else { newGrid.appendChild(cardEl); newSect.style.display = 'block'; }
     });
     lucide.createIcons();
 }
 
-// ── Sorting State ──────────────────────────────────────────
+// ── Sorting ───────────────────────────────────────────────
 let egresosSort = { col: null, dir: 'asc' };
 let cobrarSort = { col: null, dir: 'asc' };
 
 window.sortEgresos = (col) => {
-    if (egresosSort.col === col) {
-        egresosSort.dir = egresosSort.dir === 'asc' ? 'desc' : 'asc';
-    } else {
-        egresosSort.col = col;
-        egresosSort.dir = 'asc';
-    }
-    
-    const sortFn = (a, b) => {
-        let valA, valB;
-        if (col === 'currency') {
-            valA = a._type || 'CRC';
-            valB = b._type || 'CRC';
-        } else {
-            valA = a[col];
-            valB = b[col];
-        }
-        
-        if (col === 'amount') {
-            valA = parseFloat(valA) || 0;
-            valB = parseFloat(valB) || 0;
-        } else if (col === 'date') {
-            valA = valA || '';
-            valB = valB || '';
-        } else if (col === 'concept') {
-            valA = (valA || '').toString().toLowerCase();
-            valB = (valB || '').toString().toLowerCase();
-        } else if (col === 'selected' || col === 'selected_card') {
-            valA = valA ? 1 : 0;
-            valB = valB ? 1 : 0;
-        }
-        
-        if (valA < valB) return egresosSort.dir === 'asc' ? -1 : 1;
-        if (valA > valB) return egresosSort.dir === 'asc' ? 1 : -1;
-        return 0;
-    };
-    
-    dataCRC.sort(sortFn);
-    dataUSD.sort(sortFn);
-    
-    renderTable();
-    saveToCloud();
+    egresosSort = { col, dir: egresosSort.col === col && egresosSort.dir === 'asc' ? 'desc' : 'asc' };
+    renderTable(); saveToCloud();
 };
-
 window.sortCobrar = (col) => {
-    if (cobrarSort.col === col) {
-        cobrarSort.dir = cobrarSort.dir === 'asc' ? 'desc' : 'asc';
-    } else {
-        cobrarSort.col = col;
-        cobrarSort.dir = 'asc';
-    }
-    
-    const sortFn = (a, b) => {
-        let valA, valB;
-        valA = a[col];
-        valB = b[col];
-        
-        if (col === 'amount') {
-            valA = parseFloat(valA) || 0;
-            valB = parseFloat(valB) || 0;
-        } else if (col === 'date' || col === 'tentativeDate') {
-            valA = valA || '';
-            valB = valB || '';
-        } else if (col === 'client' || col === 'observations') {
-            valA = (valA || '').toString().toLowerCase();
-            valB = (valB || '').toString().toLowerCase();
-        } else if (col === 'selected') {
-            valA = valA ? 1 : 0;
-            valB = valB ? 1 : 0;
-        }
-        
-        if (valA < valB) return cobrarSort.dir === 'asc' ? -1 : 1;
-        if (valA > valB) return cobrarSort.dir === 'asc' ? 1 : -1;
-        return 0;
-    };
-    
-    receivablesCRC.sort(sortFn);
-    receivablesUSD.sort(sortFn);
-    
-    renderReceivablesTable();
-    saveToCloud();
+    cobrarSort = { col, dir: cobrarSort.col === col && cobrarSort.dir === 'asc' ? 'desc' : 'asc' };
+    renderReceivablesTable(); saveToCloud();
 };
 
 function updateSortIcons() {
     const egCols = ['currency', 'date', 'concept', 'amount', 'selected', 'selected_card'];
     egCols.forEach(col => {
-        const el = document.getElementById(`sortIcon_egresos_${col}`);
-        if (!el) return;
-        if (egresosSort.col === col) {
-            el.innerHTML = egresosSort.dir === 'asc' 
-                ? `<i data-lucide="chevron-up" class="w-3 h-3 text-brand-blue inline-block align-middle ml-0.5"></i>`
-                : `<i data-lucide="chevron-down" class="w-3 h-3 text-brand-blue inline-block align-middle ml-0.5"></i>`;
-        } else {
-            el.innerHTML = `<i data-lucide="chevrons-up-down" class="w-3 h-3 text-gray-300 inline-block align-middle ml-0.5"></i>`;
-        }
+        const el = document.getElementById(`sortIcon_egresos_${col}`); if (!el) return;
+        el.innerHTML = egresosSort.col === col ? `<i data-lucide="chevron-${egresosSort.dir==='asc'?'up':'down'}" class="w-3 h-3 text-brand-blue inline-block align-middle ml-0.5"></i>` : `<i data-lucide="chevrons-up-down" class="w-3 h-3 text-gray-300 inline-block align-middle ml-0.5"></i>`;
     });
-
     const cobCols = ['currency', 'date', 'client', 'amount', 'tentativeDate', 'observations', 'selected'];
     cobCols.forEach(col => {
-        const el = document.getElementById(`sortIcon_cobrar_${col}`);
-        if (!el) return;
-        if (cobrarSort.col === col) {
-            el.innerHTML = cobrarSort.dir === 'asc' 
-                ? `<i data-lucide="chevron-up" class="w-3 h-3 text-brand-green inline-block align-middle ml-0.5"></i>`
-                : `<i data-lucide="chevron-down" class="w-3 h-3 text-brand-green inline-block align-middle ml-0.5"></i>`;
-        } else {
-            el.innerHTML = `<i data-lucide="chevrons-up-down" class="w-3 h-3 text-gray-300 inline-block align-middle ml-0.5"></i>`;
-        }
+        const el = document.getElementById(`sortIcon_cobrar_${col}`); if (!el) return;
+        el.innerHTML = cobrarSort.col === col ? `<i data-lucide="chevron-${cobrarSort.dir==='asc'?'up':'down'}" class="w-3 h-3 text-brand-green inline-block align-middle ml-0.5"></i>` : `<i data-lucide="chevrons-up-down" class="w-3 h-3 text-gray-300 inline-block align-middle ml-0.5"></i>`;
     });
-    
     lucide.createIcons();
 }
 
@@ -1592,12 +1356,9 @@ function updateCalculations() {
     const cajaCurrency = document.getElementById('cajaChicaCurrency').value || 'CRC';
     
     document.getElementById('tcDisplay').textContent = exRate.toLocaleString('es-CR');
-
-    // Caja chica en USD
     const cajaChicaUSD = cajaCurrency === 'CRC' ? (initCaja / exRate) : initCaja;
     document.getElementById('dispCajaChica').textContent = fmt(initCaja, cajaCurrency === 'CRC' ? '₡' : '$');
 
-    // Disponible inicial Bancos + Caja Chica
     const banksInitUSD = initUSD + (initCRC / exRate);
     const totalDisp = banksInitUSD + cajaChicaUSD;
 
@@ -1605,12 +1366,11 @@ function updateCalculations() {
     document.getElementById('dispUSD').textContent = fmt(initUSD, '$');
     
     const dtEl = document.getElementById('dispTotal');
-    dtEl.textContent = fmt(totalDisp, '$');
-    dtEl.className = `fund-value global${totalDisp<0?' neg':''}`;
+    if (dtEl) { dtEl.textContent = fmt(totalDisp, '$'); dtEl.className = `fund-value global${totalDisp<0?' neg':''}`; }
 
-    // 1. Egresos Bancarios Seleccionados
-    const selCRC = dataCRC.filter(i=>i.selected);
-    const selUSD = dataUSD.filter(i=>i.selected);
+    // Egresos Seleccionados
+    const selCRC = egresos.filter(i=>i.selected && i.currency === 'CRC');
+    const selUSD = egresos.filter(i=>i.selected && i.currency === 'USD');
     const sumCRC = selCRC.reduce((s,i)=>s+i.amount,0);
     const sumUSD = selUSD.reduce((s,i)=>s+i.amount,0);
     const sumTotal = sumUSD + (sumCRC / exRate);
@@ -1619,16 +1379,13 @@ function updateCalculations() {
     setPayVal('paySubCRC', sumCRC, '₡', selCRC.length, 'payCountCRC', 'mov');
     setPayVal('paySubUSD', sumUSD, '$', selUSD.length, 'payCountUSD', 'mov');
     const ptEl = document.getElementById('payTotal');
-    if(ptEl) {
-        ptEl.textContent = fmt(sumTotal, '$');
-        ptEl.className = `pay-value${sumTotal===0?' zero':' highlight-val'}`;
-    }
+    if(ptEl) { ptEl.textContent = fmt(sumTotal, '$'); ptEl.className = `pay-value${sumTotal===0?' zero':' highlight-val'}`; }
     const pctEl = document.getElementById('payCountTotal');
     if(pctEl) pctEl.textContent = `${totalSel} movimiento${totalSel!==1?'s':''}`;
 
-    // 2. Egresos con Tarjeta Seleccionados
-    const selCardCRC = dataCRC.filter(i=>i.selected_card);
-    const selCardUSD = dataUSD.filter(i=>i.selected_card);
+    // Egresos Tarjeta Seleccionados
+    const selCardCRC = egresos.filter(i=>i.selected_card && i.currency === 'CRC');
+    const selCardUSD = egresos.filter(i=>i.selected_card && i.currency === 'USD');
     const sumCardCRC = selCardCRC.reduce((s,i)=>s+i.amount,0);
     const sumCardUSD = selCardUSD.reduce((s,i)=>s+i.amount,0);
     const sumCardTotal = sumCardUSD + (sumCardCRC / exRate);
@@ -1637,21 +1394,18 @@ function updateCalculations() {
     setPayVal('cardPaySubCRC', sumCardCRC, '₡', selCardCRC.length, 'cardPayCountCRC', 'cargo');
     setPayVal('cardPaySubUSD', sumCardUSD, '$', selCardUSD.length, 'cardPayCountUSD', 'cargo');
     const cptEl = document.getElementById('cardPayTotal');
-    if(cptEl) {
-        cptEl.textContent = fmt(sumCardTotal, '$');
-        cptEl.className = `pay-value${sumCardTotal===0?' zero':' highlight-green-val'}`;
-    }
+    if(cptEl) { cptEl.textContent = fmt(sumCardTotal, '$'); cptEl.className = `pay-value${sumCardTotal===0?' zero':' highlight-green-val'}`; }
     const cpctEl = document.getElementById('cardPayCountTotal');
     if(cpctEl) cpctEl.textContent = `${totalCardSel} cargo${totalCardSel!==1?'s':''}`;
 
-    // 3. Saldo Bancario Proyectado (Fondo Inicial - TODOS los egresos sin tarjeta)
-    const finalCRC = dataCRC.filter(i=>!i.selected_card).reduce((s,i) => s - i.amount, initCRC);
-    const finalUSD = dataUSD.filter(i=>!i.selected_card).reduce((s,i) => s - i.amount, initUSD);
+    // Saldo Bancos Proyectado
+    const finalCRC = egresos.filter(i=>!i.selected_card && i.currency === 'CRC').reduce((s,i) => s - i.amount, initCRC);
+    const finalUSD = egresos.filter(i=>!i.selected_card && i.currency === 'USD').reduce((s,i) => s - i.amount, initUSD);
     const globalBankUSD = finalUSD + (finalCRC / exRate);
 
-    // 4. Cuentas por Cobrar Seleccionadas
-    const selRecCRC = receivablesCRC.filter(i=>i.selected);
-    const selRecUSD = receivablesUSD.filter(i=>i.selected);
+    // Cuentas por Cobrar Seleccionadas
+    const selRecCRC = cobros.filter(i=>i.selected && i.currency === 'CRC');
+    const selRecUSD = cobros.filter(i=>i.selected && i.currency === 'USD');
     const sumRecCRC = selRecCRC.reduce((s,i)=>s+i.amount,0);
     const sumRecUSD = selRecUSD.reduce((s,i)=>s+i.amount,0);
     const sumRecTotal = sumRecUSD + (sumRecCRC / exRate);
@@ -1660,221 +1414,110 @@ function updateCalculations() {
     setPayVal('recSubCRC', sumRecCRC, '₡', selRecCRC.length, 'recCountCRC', 'cuenta');
     setPayVal('recSubUSD', sumRecUSD, '$', selRecUSD.length, 'recCountUSD', 'cuenta');
     const rtEl = document.getElementById('recTotal');
-    if(rtEl) {
-        rtEl.textContent = fmt(sumRecTotal, '$');
-        rtEl.className = `pay-value${sumRecTotal===0?' zero':' highlight-green-val'}`;
-    }
+    if(rtEl) { rtEl.textContent = fmt(sumRecTotal, '$'); rtEl.className = `pay-value${sumRecTotal===0?' zero':' highlight-green-val'}`; }
     const rctEl = document.getElementById('recCountTotal');
     if(rctEl) rctEl.textContent = `${totalRecSel} cuenta${totalRecSel!==1?'s':''} seleccionada${totalRecSel!==1?'s':''}`;
 
-    // 4b. Relación Cobros vs Egresos (Generales y Seleccionadas)
-    const allRecCRC = receivablesCRC.reduce((s, i) => s + i.amount, 0);
-    const allRecUSD = receivablesUSD.reduce((s, i) => s + i.amount, 0);
+    // Relación Cobros vs Egresos
+    const allRecCRC = cobros.filter(i=>i.currency === 'CRC').reduce((s, i) => s + i.amount, 0);
+    const allRecUSD = cobros.filter(i=>i.currency === 'USD').reduce((s, i) => s + i.amount, 0);
     const totalRecGeneral = allRecUSD + (allRecCRC / exRate);
 
-    const allPayCRC = dataCRC.reduce((s, i) => s + i.amount, 0);
-    const allPayUSD = dataUSD.reduce((s, i) => s + i.amount, 0);
+    const allPayCRC = egresos.filter(i=>i.currency === 'CRC').reduce((s, i) => s + i.amount, 0);
+    const allPayUSD = egresos.filter(i=>i.currency === 'USD').reduce((s, i) => s + i.amount, 0);
     const totalPayGeneral = allPayUSD + (allPayCRC / exRate);
 
     const balanceSelected = sumRecTotal - (sumTotal + sumCardTotal);
     const balanceGeneral = totalRecGeneral - totalPayGeneral;
 
-    // Render Egresos General Totals
-    setPayVal('payGenCRC', allPayCRC, '₡', dataCRC.length, 'payGenCountCRC', 'mov');
-    setPayVal('payGenUSD', allPayUSD, '$', dataUSD.length, 'payGenCountUSD', 'mov');
+    setPayVal('payGenCRC', allPayCRC, '₡', egresos.filter(i=>i.currency==='CRC').length, 'payGenCountCRC', 'mov');
+    setPayVal('payGenUSD', allPayUSD, '$', egresos.filter(i=>i.currency==='USD').length, 'payGenCountUSD', 'mov');
     const pgEl = document.getElementById('payGenTotal');
-    if(pgEl) {
-        pgEl.textContent = fmt(totalPayGeneral, '$');
-        pgEl.className = `pay-value${totalPayGeneral===0?' zero':''}`;
-    }
+    if(pgEl) { pgEl.textContent = fmt(totalPayGeneral, '$'); pgEl.className = `pay-value${totalPayGeneral===0?' zero':''}`; }
     const pgcEl = document.getElementById('payGenCountTotal');
-    if(pgcEl) {
-        const totalCount = dataCRC.length + dataUSD.length;
-        pgcEl.textContent = `${totalCount} movimiento${totalCount!==1?'s':''}`;
-    }
+    if(pgcEl) pgcEl.textContent = `${egresos.length} movimientos`;
 
-    // Render Cobrar General Totals
-    setPayVal('recGenCRC', allRecCRC, '₡', receivablesCRC.length, 'recGenCountCRC', 'cuenta');
-    setPayVal('recGenUSD', allRecUSD, '$', receivablesUSD.length, 'recGenCountUSD', 'cuenta');
+    setPayVal('recGenCRC', allRecCRC, '₡', cobros.filter(i=>i.currency==='CRC').length, 'recGenCountCRC', 'cuenta');
+    setPayVal('recGenUSD', allRecUSD, '$', cobros.filter(i=>i.currency==='USD').length, 'recGenCountUSD', 'cuenta');
     const rgEl = document.getElementById('recGenTotal');
-    if(rgEl) {
-        rgEl.textContent = fmt(totalRecGeneral, '$');
-        rgEl.className = `pay-value${totalRecGeneral===0?' zero':''}`;
-    }
+    if(rgEl) { rgEl.textContent = fmt(totalRecGeneral, '$'); rgEl.className = `pay-value${totalRecGeneral===0?' zero':''}`; }
     const rgcEl = document.getElementById('recGenCountTotal');
-    if(rgcEl) {
-        const totalRecCount = receivablesCRC.length + receivablesUSD.length;
-        rgcEl.textContent = `${totalRecCount} cuenta${totalRecCount!==1?'s':''}`;
-    }
+    if(rgcEl) rgcEl.textContent = `${cobros.length} cuentas`;
 
-    // Update values and colors for Egresos Tab
-    const egSelEl = document.getElementById('egresosBalanceSel');
-    if (egSelEl) {
-        egSelEl.textContent = fmt(balanceSelected, '$');
-        egSelEl.className = `pay-value font-black ${balanceSelected < 0 ? 'text-red-500' : 'text-brand-green'}`;
-    }
-    const egSelDetEl = document.getElementById('egresosBalanceSelDetails');
-    if (egSelDetEl) {
-        egSelDetEl.textContent = `Cobros: ${fmt(sumRecTotal, '$')} - Egresos: ${fmt(sumTotal + sumCardTotal, '$')}`;
-    }
-    const egGenEl = document.getElementById('egresosBalanceGen');
-    if (egGenEl) {
-        egGenEl.textContent = fmt(balanceGeneral, '$');
-        egGenEl.className = `pay-value font-black ${balanceGeneral < 0 ? 'text-red-500' : 'text-brand-green'}`;
-    }
-    const egGenDetEl = document.getElementById('egresosBalanceGenDetails');
-    if (egGenDetEl) {
-        egGenDetEl.textContent = `Cobros: ${fmt(totalRecGeneral, '$')} - Egresos: ${fmt(totalPayGeneral, '$')}`;
-    }
+    // Actualizar balances de pestañas
+    ['egresos', 'cobrar'].forEach(prefix => {
+        const selEl = document.getElementById(`${prefix}BalanceSel`);
+        if (selEl) { selEl.textContent = fmt(balanceSelected, '$'); selEl.className = `pay-value font-black ${balanceSelected < 0 ? 'text-red-500' : 'text-brand-green'}`; }
+        const detEl = document.getElementById(`${prefix}BalanceSelDetails`);
+        if (detEl) detEl.textContent = `Cobros: ${fmt(sumRecTotal, '$')} - Egresos: ${fmt(sumTotal + sumCardTotal, '$')}`;
+        
+        const genEl = document.getElementById(`${prefix}BalanceGen`);
+        if (genEl) { genEl.textContent = fmt(balanceGeneral, '$'); genEl.className = `pay-value font-black ${balanceGeneral < 0 ? 'text-red-500' : 'text-brand-green'}`; }
+        const genDetEl = document.getElementById(`${prefix}BalanceGenDetails`);
+        if (genDetEl) genDetEl.textContent = `Cobros: ${fmt(totalRecGeneral, '$')} - Egresos: ${fmt(totalPayGeneral, '$')}`;
+    });
 
-    // Update values and colors for Cobrar Tab
-    const cobSelEl = document.getElementById('cobrarBalanceSel');
-    if (cobSelEl) {
-        cobSelEl.textContent = fmt(balanceSelected, '$');
-        cobSelEl.className = `pay-value font-black ${balanceSelected < 0 ? 'text-red-500' : 'text-brand-green'}`;
-    }
-    const cobSelDetEl = document.getElementById('cobrarBalanceSelDetails');
-    if (cobSelDetEl) {
-        cobSelDetEl.textContent = `Cobros: ${fmt(sumRecTotal, '$')} - Egresos: ${fmt(sumTotal + sumCardTotal, '$')}`;
-    }
-    const cobGenEl = document.getElementById('cobrarBalanceGen');
-    if (cobGenEl) {
-        cobGenEl.textContent = fmt(balanceGeneral, '$');
-        cobGenEl.className = `pay-value font-black ${balanceGeneral < 0 ? 'text-red-500' : 'text-brand-green'}`;
-    }
-    const cobGenDetEl = document.getElementById('cobrarBalanceGenDetails');
-    if (cobGenDetEl) {
-        cobGenDetEl.textContent = `Cobros: ${fmt(totalRecGeneral, '$')} - Egresos: ${fmt(totalPayGeneral, '$')}`;
-    }
-
-    // 5. Totales de Tarjetas de Crédito por Grupo
+    // Grupos de Tarjetas Consolidados
     const groupData = {
         empresa: { name: 'Tarjetas Empresa', limit: 0, initial: 0, charges: 0, color: 'bg-brand-blue' },
         luis:    { name: 'Personales Luis', limit: 0, initial: 0, charges: 0, color: 'bg-brand-blue' },
         khay:    { name: 'Personales Khay', limit: 0, initial: 0, charges: 0, color: 'bg-brand-green' },
         otro:    { name: 'Nuevas Asignaciones', limit: 0, initial: 0, charges: 0, color: 'bg-brand-cyan' }
     };
-
     creditCards.forEach(c => {
         const group = c.group || 'otro';
-        if (!groupData[group]) {
-            groupData[group] = { name: group === 'otro' ? 'Nuevas Asignaciones' : group, limit: 0, initial: 0, charges: 0, color: 'bg-brand-cyan' };
-        }
-        groupData[group].limit += c.limit || 0;
-        groupData[group].initial += c.available || 0;
+        if (groupData[group]) { groupData[group].limit += c.limit || 0; groupData[group].initial += c.available || 0; }
     });
-
-    // Calcular cargos para cada grupo
-    dataCRC.forEach(item => {
+    egresos.forEach(item => {
         if (item.selected_card) {
             const card = creditCards.find(c => c.id === item.card_id);
             const group = card ? (card.group || 'otro') : 'empresa';
-            const amountInUSD = item.amount / exRate;
-            if (groupData[group]) {
-                groupData[group].charges += amountInUSD;
-            }
+            if (groupData[group]) groupData[group].charges += item.currency === 'CRC' ? item.amount / exRate : item.amount;
         }
     });
 
-    dataUSD.forEach(item => {
-        if (item.selected_card) {
-            const card = creditCards.find(c => c.id === item.card_id);
-            const group = card ? (card.group || 'otro') : 'empresa';
-            const amountInUSD = item.amount;
-            if (groupData[group]) {
-                groupData[group].charges += amountInUSD;
-            }
-        }
-    });
-
-    // Calcular totales consolidados
-    let totalLimit = 0;
-    let totalInitial = 0;
-    let totalCharges = 0;
+    let totalLimit = 0, totalInitial = 0, totalCharges = 0;
     Object.keys(groupData).forEach(gKey => {
         const grp = groupData[gKey];
-        totalLimit += grp.limit;
-        totalInitial += grp.initial;
-        totalCharges += grp.charges;
+        totalLimit += grp.limit; totalInitial += grp.initial; totalCharges += grp.charges;
     });
     const totalAvailable = totalInitial - totalCharges;
 
-    // Renderizar la grilla de grupos
     const summaryGrid = document.getElementById('cardSummaryGrid');
     if (summaryGrid) {
         summaryGrid.innerHTML = '';
-        
-        // Decidir qué grupos mostrar
         const groupsToShow = ['empresa', 'luis', 'khay'];
-        const hasOtro = creditCards.some(c => c.group === 'otro' || !['empresa', 'luis', 'khay'].includes(c.group));
-        if (hasOtro) {
-            groupsToShow.push('otro');
-        }
-
-        // Ajustar columnas de la grilla según la cantidad de elementos
-        const colCount = groupsToShow.length + 1; // grupos + consolidado
+        if (creditCards.some(c => c.group === 'otro')) groupsToShow.push('otro');
+        const colCount = groupsToShow.length + 1;
         summaryGrid.className = `grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-${colCount} divide-y sm:divide-y-0 lg:divide-x divide-gray-200`;
 
         groupsToShow.forEach(gKey => {
-            const grp = groupData[gKey];
-            if (!grp) return;
+            const grp = groupData[gKey]; if (!grp) return;
             const proj = grp.initial - grp.charges;
-            const isNegative = proj < 0;
-
             const col = document.createElement('div');
             col.className = "p-4 sm:p-5 flex flex-col justify-between";
-            col.innerHTML = `
-                <div>
-                    <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
-                        <span class="w-2 h-2 rounded-full ${grp.color}"></span> ${grp.name}
-                    </div>
-                    <div class="text-xl font-extrabold mt-1.5 ${isNegative ? 'text-red-500' : 'text-slate-800'}" style="font-family:'Montserrat', sans-serif;">
-                        ${fmt(proj, '$')}
-                    </div>
-                </div>
-                <div class="mt-3.5 text-[10px] text-gray-500 space-y-1">
-                    <div class="flex justify-between"><span>Disp. Inicial:</span> <span class="font-semibold text-gray-700">${fmt(grp.initial, '$')}</span></div>
-                    <div class="flex justify-between"><span>Cargos Prog.:</span> <span class="font-semibold text-red-500">${fmt(grp.charges, '$')}</span></div>
-                    <div class="flex justify-between"><span>Límite Total:</span> <span class="font-semibold text-gray-600">${fmt(grp.limit, '$')}</span></div>
-                </div>
-            `;
+            col.innerHTML = `<div><div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5"><span class="w-2 h-2 rounded-full ${grp.color}"></span> ${grp.name}</div>
+                <div class="text-xl font-extrabold mt-1.5 ${proj<0?'text-red-500':'text-slate-800'}" style="font-family:'Montserrat';">${fmt(proj, '$')}</div></div>
+                <div class="mt-3.5 text-[10px] text-gray-500 space-y-1"><div class="flex justify-between"><span>Inicial:</span> <span>${fmt(grp.initial, '$')}</span></div><div class="flex justify-between"><span>Cargos:</span> <span class="text-red-500">${fmt(grp.charges, '$')}</span></div></div>`;
             summaryGrid.appendChild(col);
         });
 
-        // Columna de consolidado total
-        const isTotalNegative = totalAvailable < 0;
         const totalCol = document.createElement('div');
         totalCol.className = "p-4 sm:p-5 bg-blue-50/30 flex flex-col justify-between";
-        totalCol.innerHTML = `
-            <div>
-                <div class="text-[10px] font-extrabold text-blue-700 uppercase tracking-wider flex items-center gap-1.5">
-                    <span class="w-2 h-2 rounded-full bg-brand-green"></span> Total Consolidado
-                </div>
-                <div class="text-2xl font-black mt-1.5 ${isTotalNegative ? 'text-red-500' : 'text-brand-blue'}" id="totalCardAvailable" style="font-family:'Montserrat', sans-serif;">
-                    ${fmt(totalAvailable, '$')}
-                </div>
-            </div>
-            <div class="mt-3.5 text-[10px] text-gray-600 space-y-1">
-                <div class="flex justify-between"><span>Disp. Inicial:</span> <span class="font-bold text-slate-800" id="totalCardInitAvailable">${fmt(totalInitial, '$')}</span></div>
-                <div class="flex justify-between"><span>Cargos Prog.:</span> <span class="font-bold text-red-600" id="totalCardCharges">${fmt(totalCharges, '$')}</span></div>
-                <div class="flex justify-between"><span>Límite Total:</span> <span class="font-bold text-slate-700" id="totalCardLimit">${fmt(totalLimit, '$')}</span></div>
-            </div>
-        `;
+        totalCol.innerHTML = `<div><div class="text-[10px] font-extrabold text-blue-700 uppercase tracking-wider flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-brand-green"></span> Total Consolidado</div>
+            <div class="text-2xl font-black mt-1.5 ${totalAvailable<0?'text-red-500':'text-brand-blue'}" style="font-family:'Montserrat';">${fmt(totalAvailable, '$')}</div></div>
+            <div class="mt-3.5 text-[10px] text-gray-600 space-y-1"><div class="flex justify-between"><span>Inicial:</span> <span class="font-bold">${fmt(totalInitial, '$')}</span></div><div class="flex justify-between"><span>Cargos:</span> <span class="font-bold text-red-600">${fmt(totalCharges, '$')}</span></div></div>`;
         summaryGrid.appendChild(totalCol);
     }
 
-    // 6. Proyecciones en Dashboard Global
     document.getElementById('dashBancos').textContent = fmt(globalBankUSD, '$');
     document.getElementById('dashBancos').className = `text-xl font-extrabold ${globalBankUSD<0?'text-red-500':'text-brand-blue'}`;
-    
     document.getElementById('dashCajaChica').textContent = fmt(cajaChicaUSD, '$');
     document.getElementById('dashIngresos').textContent = '+' + fmt(sumRecTotal, '$');
     
-    // Proyección de Liquidez Final = Bancos Proyectados + Caja Chica + Cuentas por Cobrar Seleccionadas
     const finalLiquidity = globalBankUSD + cajaChicaUSD + sumRecTotal;
     const dlEl = document.getElementById('dashTotal');
-    dlEl.textContent = fmt(finalLiquidity, '$');
-    dlEl.className = `text-2xl font-black ${finalLiquidity<0?'text-red-500':'text-brand-green'}`;
+    if (dlEl) { dlEl.textContent = fmt(finalLiquidity, '$'); dlEl.className = `text-2xl font-black ${finalLiquidity<0?'text-red-500':'text-brand-green'}`; }
 }
 
 function fmt(val, sym) {
@@ -1882,10 +1525,7 @@ function fmt(val, sym) {
 }
 function setPayVal(id, val, sym, count, countId, suffix = 'cuenta') {
     const el = document.getElementById(id);
-    if(el) {
-        el.textContent = fmt(val, sym);
-        el.className = `pay-value${val===0?' zero':''}`;
-    }
+    if(el) { el.textContent = fmt(val, sym); el.className = `pay-value${val===0?' zero':''}`; }
     const cEl = document.getElementById(countId);
     if(cEl) {
         let text = `${count} ${suffix}`;
@@ -1900,10 +1540,7 @@ function setPayVal(id, val, sym, count, countId, suffix = 'cuenta') {
 }
 function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
 
-window.onload = () => { 
-    startSync(); 
-    lucide.createIcons(); 
-};
+window.onload = () => { startSync(); lucide.createIcons(); };
 </script>
 
 <script>
