@@ -1137,9 +1137,24 @@ function renderTable() {
     let displayRows = [...egresos];
     if (egresosSort.col) {
         displayRows.sort((a, b) => {
+            if (egresosSort.col === 'selected') {
+                const scoreA = (a.selected ? 2 : 0) + (a.selected_card ? 1 : 0);
+                const scoreB = (b.selected ? 2 : 0) + (b.selected_card ? 1 : 0);
+                if (scoreA === scoreB) return 0;
+                return egresosSort.dir === 'asc' ? (scoreB - scoreA) : (scoreA - scoreB);
+            }
+            if (egresosSort.col === 'selected_card') {
+                const scoreA = (a.selected_card ? 2 : 0) + (a.selected ? 1 : 0);
+                const scoreB = (b.selected_card ? 2 : 0) + (b.selected ? 1 : 0);
+                if (scoreA === scoreB) return 0;
+                return egresosSort.dir === 'asc' ? (scoreB - scoreA) : (scoreA - scoreB);
+            }
             let valA = egresosSort.col === 'amount' ? (a.currency === 'CRC' ? a.amount / exRate : a.amount) : a[egresosSort.col];
             let valB = egresosSort.col === 'amount' ? (b.currency === 'CRC' ? b.amount / exRate : b.amount) : b[egresosSort.col];
             if (egresosSort.col === 'concept') { valA = (valA||'').toLowerCase(); valB = (valB||'').toLowerCase(); }
+            if (valA === valB) return 0;
+            if (valA === undefined || valA === null) return 1;
+            if (valB === undefined || valB === null) return -1;
             return egresosSort.dir === 'asc' ? (valA > valB ? 1 : -1) : (valA < valB ? 1 : -1);
         });
     }
@@ -1198,7 +1213,7 @@ function renderTable() {
         `;
         tbody.appendChild(tr);
     });
-    updateCalculations(); lucide.createIcons();
+    updateCalculations(); updateSortIcons();
 }
 
 function renderReceivablesTable() {
@@ -1209,9 +1224,18 @@ function renderReceivablesTable() {
     let displayRows = [...cobros];
     if (cobrarSort.col) {
         displayRows.sort((a, b) => {
+            if (cobrarSort.col === 'selected') {
+                const scoreA = a.selected ? 1 : 0;
+                const scoreB = b.selected ? 1 : 0;
+                if (scoreA === scoreB) return 0;
+                return cobrarSort.dir === 'asc' ? (scoreB - scoreA) : (scoreA - scoreB);
+            }
             let valA = cobrarSort.col === 'amount' ? (a.currency === 'CRC' ? a.amount / exRate : a.amount) : a[cobrarSort.col];
             let valB = cobrarSort.col === 'amount' ? (b.currency === 'CRC' ? b.amount / exRate : b.amount) : b[cobrarSort.col];
             if (cobrarSort.col === 'client' || cobrarSort.col === 'observations') { valA = (valA||'').toLowerCase(); valB = (valB||'').toLowerCase(); }
+            if (valA === valB) return 0;
+            if (valA === undefined || valA === null) return 1;
+            if (valB === undefined || valB === null) return -1;
             return cobrarSort.dir === 'asc' ? (valA > valB ? 1 : -1) : (valA < valB ? 1 : -1);
         });
     }
@@ -1256,7 +1280,7 @@ function renderReceivablesTable() {
         `;
         tbody.appendChild(tr);
     });
-    updateCalculations(); lucide.createIcons();
+    updateCalculations(); updateSortIcons();
 }
 
 function renderCards() {
